@@ -1,0 +1,94 @@
+# ./u_fork_test
+[  550.424516] ---> in load_elf_binary: PID: 1580
+[  550.425148] ---> in flush_old_exec: PID: 1580
+[  550.426220] ---> in do_close_on_exec: PID: 1580
+in father process 1580
+in child process 1582
+[  551.498699] ---> in load_elf_binary: PID: 1582
+[  551.499152] ---> in flush_old_exec: PID: 1582
+[  551.501995] ---> in do_close_on_exec: PID: 1582
+[  551.502279] PID 1582: test_flush
+[  551.502627] WARNING: CPU: 0 PID: 1582 at /home/wangzhou/tests/fork_exec/fork_test.c:60 test_flush+0x24/0x38 [fork_test]
+[  551.503110] Modules linked in: fork_test(O) [last unloaded: fork_test]
+[  551.503463] CPU: 0 PID: 1582 Comm: u_fork_test Tainted: G        W  O      5.1.0-rc3-43982-g896d7d6b318e-dirty #54
+[  551.503923] Hardware name: linux,dummy-virt (DT)
+[  551.504155] pstate: 40000005 (nZcv daif -PAN -UAO)
+[  551.504396] pc : test_flush+0x24/0x38 [fork_test]
+[  551.504631] lr : test_flush+0x24/0x38 [fork_test]
+[  551.504852] sp : ffff000011803b80
+[  551.505019] x29: ffff000011803b80 x28: ffff80000a53f400
+[  551.505277] x27: ffff80000a53f800 x26: 0000000000000000
+[  551.505581] x25: ffff80007b74f100 x24: 0000000000000000
+[  551.505844] x23: ffff80007b7fee00 x22: ffff80007b74f0a8
+[  551.506121] x21: ffff80007b74f080 x20: ffff80007b74f080
+[  551.506392] x19: ffff80007b7fee00 x18: ffffffffffffffff
+[  551.506676] x17: 0000000000000001 x16: 0000000000000007
+[  551.506937] x15: ffff00001126d6c8 x14: ffff0000918038c7
+[  551.507193] x13: ffff0000118038d5 x12: ffff000011286000
+[  551.507473] x11: 0000000005f5e0ff x10: ffff00001126df40
+[  551.507732] x9 : ffff00001124e018 x8 : 00000000000002d5
+[  551.507987] x7 : 0000000000000017 x6 : 000000000000000a
+[  551.508270] x5 : 0000000000000001 x4 : ffff80007dbd8110
+[  551.508550] x3 : ffff80007dbd8110 x2 : 51f6ecb247944300
+[  551.508823] x1 : 0000000000000000 x0 : 0000000000000014
+[  551.509101] Call trace:
+[  551.509269]  test_flush+0x24/0x38 [fork_test]
+[  551.509518]  filp_close+0x30/0x90
+[  551.509713]  do_close_on_exec+0xb0/0x100
+[  551.509925]  flush_old_exec+0x494/0x6a0
+[  551.510135]  load_elf_binary+0x2bc/0x12f8
+[  551.510338]  search_binary_handler+0x90/0x290
+[  551.510576]  __do_execve_file.isra.15+0x5e0/0x6f8
+[  551.510808]  do_execve+0x2c/0x38
+[  551.510981]  __arm64_sys_execve+0x28/0x38
+[  551.511189]  el0_svc_common+0x5c/0x100
+[  551.511383]  el0_svc_handler+0x2c/0x80
+[  551.511574]  el0_svc+0x8/0xc
+[  551.511730] ---[ end trace 502b0d48cddd3462 ]---
+total 11752
+drwxr-xr-x    2 10019    10004         4096 Jun  9 10:06 .
+drwxr-xr-x   17 root     root             0 Jan  7 06:44 ..
+-rw-r--r--    1 10019    10004            5 Jan 12 06:55 456
+-rwxr-xr-x    1 10019    10004      5482000 Jun  9 09:34 a.out
+-rw-r--r--    1 10019    1018        241896 Jun  9 10:09 fork_test.ko
+-rw-r--r--    1 10019    10004       197221 Mar  4 12:53 kthread_test.ko
+-rw-r--r--    1 10019    10004            5 Jan 12 06:55 test_9p
+-rwxr-xr-x    1 10019    1018       5482000 Jun  9 10:09 u_fork_test
+-rw-r--r--    1 10019    10004       337777 May  7 04:34 uacce.ko
+-rw-r--r--    1 10019    10004       265991 May  7 04:34 wd_dummy2.ko
+^C[  554.538907] PID 1581: test_flush
+[  554.539255] WARNING: CPU: 0 PID: 1581 at /home/wangzhou/tests/fork_exec/fork_test.c:60 test_flush+0x24/0x38 [fork_test]
+[  554.539911] Modules linked in: fork_test(O) [last unloaded: fork_test]
+[  554.540253] CPU: 0 PID: 1581 Comm: u_fork_test Tainted: G        W  O      5.1.0-rc3-43982-g896d7d6b318e-dirty #54
+[  554.540691] Hardware name: linux,dummy-virt (DT)
+[  554.540918] pstate: 40000005 (nZcv daif -PAN -UAO)
+[  554.541156] pc : test_flush+0x24/0x38 [fork_test]
+[  554.541391] lr : test_flush+0x24/0x38 [fork_test]
+[  554.541610] sp : ffff0000117e3c40
+[  554.541776] x29: ffff0000117e3c40 x28: ffff80000a483700
+[  554.542032] x27: 0000000000000000 x26: ffff80007acfa940
+[  554.542286] x25: ffff80007aee3aa0 x24: 0000000000000001
+[  554.542557] x23: ffff80007b74f8c0 x22: ffff80007b74f8e8
+[  554.542813] x21: 0000000000000000 x20: ffff80007b74f8c0
+[  554.543068] x19: ffff80007b7fee00 x18: ffffffffffffffff
+[  554.543322] x17: 0000000000000000 x16: 0000000000000000
+[  554.543574] x15: ffff00001126d6c8 x14: ffff0000917e3987
+[  554.543827] x13: ffff0000117e3995 x12: ffff000011286000
+[  554.544078] x11: 0000000005f5e0ff x10: ffff00001126df40
+[  554.544331] x9 : ffff00001124e018 x8 : 00000000000002fb
+[  554.544583] x7 : 0000000000000017 x6 : ffff80007dbd8118
+[  554.544835] x5 : ffff80007dbd8118 x4 : 0000000000000000
+[  554.545088] x3 : ffff80007dbdee98 x2 : 51f6ecb247944300
+[  554.545341] x1 : 0000000000000000 x0 : 0000000000000014
+[  554.545597] Call trace:
+[  554.545748]  test_flush+0x24/0x38 [fork_test]
+[  554.545976]  filp_close+0x30/0x90
+[  554.546158]  put_files_struct+0xf8/0x100
+[  554.546358]  exit_files+0x40/0x58
+[  554.546549]  do_exit+0x570/0x998
+[  554.546754]  do_group_exit+0x38/0xa0
+[  554.546947]  get_signal+0xac/0x5b0
+[  554.547134]  do_notify_resume+0x1a8/0x350
+[  554.547336]  work_pending+0x8/0x10
+[  554.547511] ---[ end trace 502b0d48cddd3463 ]---
+[  554.553519] PID 1581: test_release
