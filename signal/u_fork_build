@@ -1,0 +1,2 @@
+fork_test: fork_test.c
+	aarch64-linux-gnu-gcc u_fork_test.c -lpthread --static -o u_fork_test
