@@ -1,7 +1,8 @@
 /*
  *  uname -a
  *	Linux kllp05 4.15.0-50-generic #54-Ubuntu SMP Mon May 6 18:46:08 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
- *  test result shows that: gethostbyname will return host IPs in /etc/hosts
+ *  test result shows that: gethostbyname will return host IPs in /etc/hosts.
+ *  struct hostnet's defination is in /usr/include/netdb.h.
  */
 #include <stdio.h>
 #include <netdb.h>
