@@ -53,16 +53,10 @@ void main()
 	memcpy(dts2, src2, TEST_MEM_SIZE);
 	gettimeofday(&tv4, NULL);
 
-	printf("tv_sec: %ld, tv_usec: %ld\n", tv1.tv_sec, tv1.tv_usec);
-	printf("tv_sec: %ld, tv_usec: %ld\n", tv2.tv_sec, tv2.tv_usec);
-	printf("tv_sec: %ld, tv_usec: %ld\n", tv3.tv_sec, tv3.tv_usec);
-	printf("tv_sec: %ld, tv_usec: %ld\n", tv4.tv_sec, tv4.tv_usec);
-
-	printf("performance of test1: %ld us/1G\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
-	printf("performance of test2: %ld us/1G\n", (tv4.tv_sec - tv3.tv_sec) * 1000000 + (tv4.tv_usec - tv3.tv_usec));
-
+	speed = (float)TEST_MEM_SIZE / 1024 / ((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
+	printf("dts no pre-fault memcpy: %0.3f K/us\n", speed);
 	speed = (float)TEST_MEM_SIZE / 1024 / ((tv4.tv_sec - tv3.tv_sec) * 1000000 + (tv4.tv_usec - tv3.tv_usec));
-	printf("performance of test2: %0.3f K/us\n", speed);
+	printf("pre-fault memcpy: %0.3f K/us\n", speed);
 
 	free(dts2);
 free_src2:
