@@ -6,7 +6,7 @@
 MODULE_LICENSE("Dual BSD/GPL");
 
 struct work_struct work0, work1, work2, work3, work4, work5, work6, work7, work8;
-struct workqueue_struct *test_wq;
+struct workqueue_struct *test_wq, *ub_wq1, *ub_wq2, *ub_wq3, *ub_wq4;
 
 #define WORK_FUN(n)						\
 static void work_fun##n(struct work_struct *work)		\
@@ -16,8 +16,8 @@ static void work_fun##n(struct work_struct *work)		\
 	pr_info("I am in CPU%d in PID%d[%s] -- %d\n",		\
 			raw_smp_processor_id(),			\
 			current->pid, current->comm, num);	\
-	msleep(5000);						\
 }
+//	msleep(5000);						
 /* note: msleep above only be used in case 3. in other cases, comment out */
 
 WORK_FUN(0)
@@ -71,8 +71,8 @@ static int __init wq_init(void)
 	 *
 	 * 5. add WQ_SYSFS, it can register related wq to sysfs.
 	 */
-//	test_wq = alloc_workqueue("test_wq", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
-	test_wq = alloc_workqueue("test_wq", WQ_UNBOUND | WQ_SYSFS, 0);
+	test_wq = alloc_workqueue("test_wq", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
+	//test_wq = alloc_workqueue("test_wq", WQ_UNBOUND | WQ_SYSFS, 0);
 	if (!test_wq)
 		return -1;
 
@@ -90,12 +90,14 @@ static int __init wq_init(void)
 		raw_smp_processor_id(), current->pid, current->comm);
 
 	/* case 1 */
+	/* can not run in cpu 5 everytime, but always run in cpu of same numa node */
 //	queue_work_on(5, test_wq, &work1);
 
 	/* case 2 */
 //	schedule_work(&work1);
 
 	/* case 3: let's put many works to one wq to see if new worker created */
+/*
 	queue_work(test_wq, &work0);
 	queue_work(test_wq, &work1);
 	queue_work(test_wq, &work2);
@@ -105,6 +107,56 @@ static int __init wq_init(void)
 	queue_work(test_wq, &work6);
 	queue_work(test_wq, &work7);
 	queue_work(test_wq, &work8);
+*/
+	/* case 4 */
+/*
+	schedule_work(&work0);
+	schedule_work(&work1);
+	schedule_work(&work2);
+	schedule_work(&work3);
+	schedule_work(&work4);
+	schedule_work(&work5);
+	schedule_work(&work6);
+	schedule_work(&work7);
+	schedule_work(&work8);
+*/
+	/* case 5 */
+	/* this case shows that it can put works in cpu5 always */
+/*
+	schedule_work_on(5, &work0);
+	schedule_work_on(5, &work1);
+	schedule_work_on(5, &work2);
+	schedule_work_on(5, &work3);
+	schedule_work_on(5, &work4);
+	schedule_work_on(5, &work5);
+	schedule_work_on(5, &work6);
+	schedule_work_on(5, &work7);
+	schedule_work_on(5, &work8);
+*/
+	/* case 6 */
+	/*
+	 * will put below different worker in same unbound pool, however, may
+	 * put works in different worker event without "sleep", I do not know
+	 * why??
+	 *
+	 * however, if we queue_work_on same work to same cpu and wq, it will
+	 * alway on one worker.(note: add sleep so that all work1 can be put
+	 * into wq)
+	 */
+	ub_wq1 = alloc_workqueue("ub_wq1", WQ_UNBOUND | WQ_HIGHPRI | WQ_CPU_INTENSIVE | WQ_SYSFS, 0);
+	ub_wq2 = alloc_workqueue("ub_wq2", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
+	ub_wq3 = alloc_workqueue("ub_wq3", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
+	ub_wq4 = alloc_workqueue("ub_wq4", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
+	if (!ub_wq1 || !ub_wq2 || !ub_wq3 || !ub_wq4)
+		return -2;
+
+	queue_work_on(0, ub_wq1, &work1);
+//	msleep(10);
+	queue_work_on(0, ub_wq1, &work2);
+//	msleep(10);
+	queue_work_on(0, ub_wq1, &work3);
+//	msleep(10);
+	queue_work_on(0, ub_wq1, &work4);
 
         return 0;
 }
@@ -113,6 +165,10 @@ static void __exit wq_exit(void)
 {
 	/* destory work queue */
 	destroy_workqueue(test_wq);
+	destroy_workqueue(ub_wq1);
+	destroy_workqueue(ub_wq2);
+	destroy_workqueue(ub_wq3);
+	destroy_workqueue(ub_wq4);
 }
 
 module_init(wq_init);
@@ -145,5 +201,4 @@ ps -elf | grep kworker\/u
  的编号。
 
  不清楚-e/-t是什么意思?
-
 */
