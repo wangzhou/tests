@@ -8,12 +8,14 @@
  * memory copy 1G byte data in no fault and fault cases
  */
 
-#define TEST_MEM_SIZE (1024 * 4)
+#define TEST_MEM_SIZE (1024 * 1024 * 1024)
 
 void main()
 {
 	struct timeval tv1, tv2, tv3, tv4;	
 	volatile char *src1, *dts1, *src2, *dts2;
+	/* unit: K/us */
+	float speed = 0;
 	int ret = 0;
 
 	src1 = malloc(TEST_MEM_SIZE);
@@ -58,6 +60,9 @@ void main()
 
 	printf("performance of test1: %ld us/1G\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
 	printf("performance of test2: %ld us/1G\n", (tv4.tv_sec - tv3.tv_sec) * 1000000 + (tv4.tv_usec - tv3.tv_usec));
+
+	speed = (float)TEST_MEM_SIZE / 1024 / ((tv4.tv_sec - tv3.tv_sec) * 1000000 + (tv4.tv_usec - tv3.tv_usec));
+	printf("performance of test2: %0.3f K/us\n", speed);
 
 	free(dts2);
 free_src2:
