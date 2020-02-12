@@ -11,10 +11,8 @@
 
 ~/repos/qemu/aarch64-softmmu/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
 -m 2G \
--numa node,nodeid=0,mem=512,cpus=0-1 \
--numa node,nodeid=1,mem=512,cpus=2-3 \
--numa node,nodeid=2,mem=512,cpus=4-5 \
--numa node,nodeid=3,mem=512,cpus=6-7 \
+-numa node,nodeid=0,mem=1G,cpus=0-3 \
+-numa node,nodeid=1,mem=1G,cpus=4-7 \
 -smp 8 \
 -kernel ~/repos/linux/arch/arm64/boot/Image \
 -initrd ~/repos/buildroot/output/images/rootfs.cpio.gz \
