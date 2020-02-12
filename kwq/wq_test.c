@@ -16,6 +16,7 @@ static void work_fun##n(struct work_struct *work)		\
 	pr_info("I am in CPU%d in PID%d[%s] -- %d\n",		\
 			raw_smp_processor_id(),			\
 			current->pid, current->comm, num);	\
+	mdelay(1000);						\
 }
 //	msleep(5000);						
 /* note: msleep above only be used in case 3. in other cases, comment out */
@@ -52,6 +53,12 @@ static int __init wq_init(void)
 	 *    [ 6693.492337] I am in CPU7 in PID90[kworker/7:1]
 	 *
 	 *    how to put work to cpu's high pri per cpu??
+	 *    can we do this by: queue_work_on(cpu, system_highpri_wq, worker)?
+	 *    queue_work_on(cpumask_first(&hdev->affinity_mask), system_wq, worker);
+	 *
+	 *    it depends on if sleep in work function, if no sleep there, multiple
+	 *    queue_work_on system_wq will be in same worker, if sleep, multiple
+	 *    kworkers will be created in same CPU.
 	 *
 	 * 3. unbound wq, in which case new kthread will be added to system?
 	 *    e.g. in current mainline zip driver, one qp allocate one unbound
@@ -143,20 +150,28 @@ static int __init wq_init(void)
 	 * alway on one worker.(note: add sleep so that all work1 can be put
 	 * into wq)
 	 */
-	ub_wq1 = alloc_workqueue("ub_wq1", WQ_UNBOUND | WQ_HIGHPRI | WQ_CPU_INTENSIVE | WQ_SYSFS, 0);
+#if 0
+	ub_wq1 = alloc_workqueue("ub_wq1", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
 	ub_wq2 = alloc_workqueue("ub_wq2", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
 	ub_wq3 = alloc_workqueue("ub_wq3", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
 	ub_wq4 = alloc_workqueue("ub_wq4", WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS, 0);
 	if (!ub_wq1 || !ub_wq2 || !ub_wq3 || !ub_wq4)
 		return -2;
 
+	/* how to put these work in one same kworker */
 	queue_work_on(0, ub_wq1, &work1);
 //	msleep(10);
-	queue_work_on(0, ub_wq1, &work2);
+	queue_work_on(0, ub_wq2, &work2);
 //	msleep(10);
-	queue_work_on(0, ub_wq1, &work3);
+	queue_work_on(0, ub_wq2, &work3);
 //	msleep(10);
-	queue_work_on(0, ub_wq1, &work4);
+	queue_work_on(0, ub_wq3, &work4);
+#endif
+	/* case 6 */
+	queue_work_on(5, system_highpri_wq, &work1);
+	queue_work_on(5, system_highpri_wq, &work2);
+	queue_work_on(5, system_highpri_wq, &work3);
+	queue_work_on(5, system_highpri_wq, &work4);
 
         return 0;
 }
@@ -164,11 +179,14 @@ static int __init wq_init(void)
 static void __exit wq_exit(void)
 {
 	/* destory work queue */
+
 	destroy_workqueue(test_wq);
+/*
 	destroy_workqueue(ub_wq1);
 	destroy_workqueue(ub_wq2);
 	destroy_workqueue(ub_wq3);
 	destroy_workqueue(ub_wq4);
+*/
 }
 
 module_init(wq_init);
