@@ -167,7 +167,7 @@ static int __init wq_init(void)
 //	msleep(10);
 	queue_work_on(0, ub_wq3, &work4);
 #endif
-	/* case 6 */
+	/* case 7 */
 	queue_work_on(5, system_highpri_wq, &work1);
 	queue_work_on(5, system_highpri_wq, &work2);
 	queue_work_on(5, system_highpri_wq, &work3);
