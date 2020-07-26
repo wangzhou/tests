@@ -1,9 +1,11 @@
+#define	_GNU_SOURCE
 #include <unistd.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <sched.h>
 
-#define	THREAD_NUM	100
+#define	THREAD_NUM	4
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 long long a = 0, b = 0;
@@ -24,12 +26,19 @@ void *add_a(void *m)
 int main()
 {
 	pthread_t t[THREAD_NUM];
+	cpu_set_t cpuset;
 	int i;
 
 	gettimeofday(&start, NULL);
 
 	for (i = 0; i < THREAD_NUM; i++) {
 		pthread_create(&t[i], NULL, add_a, NULL);
+	}
+
+	for (i = 0; i < THREAD_NUM; i++) {
+		CPU_ZERO(&cpuset);
+		CPU_SET(i, &cpuset);
+		pthread_setaffinity_np(t[i], sizeof(cpu_set_t), &cpuset);
 	}
 
 	sleep(5);
