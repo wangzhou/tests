@@ -23,7 +23,7 @@ static void __attribute__((constructor)) open_driver_dl(void)
 {
 	void *driver_dl;
 
-	driver_dl = dlopen("./libdriver.so", RTLD_LAZY);
+	driver_dl = dlopen("./libdriver.so", RTLD_NOW);
 	if (!driver_dl)
 		printf("Fail to open libdriver\n");
 }
