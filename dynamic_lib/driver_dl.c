@@ -1,11 +1,11 @@
 #include "api_internal.h"
 
-int add(int a, int b)
+static int add(int a, int b)
 {
 	return a + b;	
 }
 
-int multi(int a, int b)
+static int multi(int a, int b)
 {
 	return a * b;	
 }
