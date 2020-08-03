@@ -10,9 +10,9 @@ static int multi(int a, int b)
 	return a * b;	
 }
 
-struct api_driver one_driver = {
+struct api_driver example_driver = {
 	.add = add,
 	.multi = multi,
 };
 
-SET_DRIVER(&one_driver);
+SET_DRIVER(example_driver);
