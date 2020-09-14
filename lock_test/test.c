@@ -1,12 +1,14 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <malloc.h>
 #include <sys/time.h>
 #include <getopt.h>
 #include <unistd.h>
 #include <asm/types.h>
 #include <assert.h>
+#include <sched.h>
+#include <pthread.h>
 
 struct wd_lock {
 	__u32 lock;
@@ -132,6 +134,7 @@ int main(int argc, char *argv[])
 	struct test_option opt = {0};
 	long long time = 0;
 	thread_fun fun;
+	cpu_set_t mask;
 	int i;
 
 	parse_cmd_line(argc, argv, &opt);
@@ -157,6 +160,13 @@ int main(int argc, char *argv[])
 		/* fix me: bind to different core */
 		pthread_create(&thread_data_array[i].p, NULL, fun,
 			       thread_data_array + i);
+
+		CPU_ZERO(&mask);
+		CPU_SET(i + 1, &mask);
+
+		if (pthread_setaffinity_np(thread_data_array[i].p, sizeof(mask),
+					   &mask) < 0)
+			printf("fail to bind thread to cpu %d\n", i + 1);
 	}
 
 	for (i = 0; i < opt.thread_num; i++) {
@@ -169,7 +179,6 @@ int main(int argc, char *argv[])
 		time += ((tmp->end.tv_sec - tmp->begin.tv_sec) * 1000000 +
 			 (tmp->end.tv_usec - tmp->begin.tv_usec));
 	}
-
 
 	printf("total time is %lld us for %s\n", time, opt.mode ? "mutexlock" : "spinlock");
 
