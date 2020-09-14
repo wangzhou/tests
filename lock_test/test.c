@@ -89,11 +89,12 @@ static void *test_thread_spinlock(void *data)
 	while (1) {
 		wd_spinlock(&spinlock);
 
-		number++;
 		if (number == total) {
 			wd_unspinlock(&spinlock);
 			break;
 		}
+
+		number++;
 
 		wd_unspinlock(&spinlock);
 	}
@@ -112,11 +113,12 @@ static void *test_thread_mutexlock(void *data)
 	while (1) {
 		pthread_mutex_lock(&mutexlock);
 
-		number++;
 		if (number == total) {
 			pthread_mutex_unlock(&mutexlock);
 			break;
 		}
+
+		number++;
 
 		pthread_mutex_unlock(&mutexlock);
 	}
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
 
 	printf("mode: %d, thread_num: %d, total: %lld\n",
 	       opt.mode, opt.thread_num, opt.total);
-
+	
 	thread_data_array = malloc(sizeof(struct thread_data) * opt.thread_num);
 	if (!thread_data_array)
 		return -1;
@@ -173,3 +175,5 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+/* gcc test.c -lpthread */
