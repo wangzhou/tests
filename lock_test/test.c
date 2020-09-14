@@ -33,6 +33,7 @@ typedef void *(*thread_fun)(void *);
 long long number = 0;
 struct self_spinlock spinlock;
 pthread_mutex_t mutexlock = PTHREAD_MUTEX_INITIALIZER;
+pthread_spinlock_t p_spinlock = 0;
 
 static inline void self_spinlock(struct self_spinlock *lock)
 {
@@ -128,6 +129,30 @@ static void *test_thread_mutexlock(void *data)
 	gettimeofday(&t_date->end, NULL);
 }
 
+static void *test_pthread_spinlock(void *data)
+{
+	struct thread_data *t_date = (struct thread_data *)data;
+	struct test_option *opt = t_date->opt;
+	long long total = opt->total;
+
+	gettimeofday(&t_date->begin, NULL);
+
+	while (1) {
+		pthread_spin_lock(&p_spinlock);
+
+		if (number == total) {
+			pthread_spin_unlock(&p_spinlock);
+			break;
+		}
+
+		number++;
+
+		pthread_spin_unlock(&p_spinlock);
+	}
+
+	gettimeofday(&t_date->end, NULL);
+}
+
 int main(int argc, char *argv[])
 {
 	struct thread_data *thread_data_array, *tmp;
@@ -149,8 +174,12 @@ int main(int argc, char *argv[])
 	/* prepare test */
 	if (opt.mode == 0)
 		fun = test_thread_spinlock;
-	else
+	else if (opt.mode == 1)
 		fun = test_thread_mutexlock;
+	else {
+		pthread_spin_init(&p_spinlock, PTHREAD_PROCESS_SHARED);
+		fun = test_pthread_spinlock;
+	}
 
 	for (i = 0; i < opt.thread_num; i++)
 		thread_data_array[i].opt = &opt;
@@ -180,7 +209,7 @@ int main(int argc, char *argv[])
 			 (tmp->end.tv_usec - tmp->begin.tv_usec));
 	}
 
-	printf("total time is %lld us for %s\n", time, opt.mode ? "mutexlock" : "spinlock");
+	printf("total time is %lld us\n", time);
 
 	return 0;
 }
