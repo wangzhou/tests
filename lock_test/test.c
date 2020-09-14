@@ -10,7 +10,7 @@
 #include <sched.h>
 #include <pthread.h>
 
-struct wd_lock {
+struct self_spinlock {
 	__u32 lock;
 };
 
@@ -31,17 +31,17 @@ struct thread_data {
 typedef void *(*thread_fun)(void *);
 
 long long number = 0;
-struct wd_lock spinlock;
+struct self_spinlock spinlock;
 pthread_mutex_t mutexlock = PTHREAD_MUTEX_INITIALIZER;
 
-static inline void wd_spinlock(struct wd_lock *lock)
+static inline void self_spinlock(struct self_spinlock *lock)
 {
 	while (__atomic_test_and_set(&lock->lock, __ATOMIC_ACQUIRE))
 		while (__atomic_load_n(&lock->lock, __ATOMIC_RELAXED))
 			;
 }
 
-static inline void wd_unspinlock(struct wd_lock *lock)
+static inline void self_unspinlock(struct self_spinlock *lock)
 {
 	__atomic_clear(&lock->lock, __ATOMIC_RELEASE);
 }
@@ -89,16 +89,16 @@ static void *test_thread_spinlock(void *data)
 	gettimeofday(&t_date->begin, NULL);
 
 	while (1) {
-		wd_spinlock(&spinlock);
+		self_spinlock(&spinlock);
 
 		if (number == total) {
-			wd_unspinlock(&spinlock);
+			self_unspinlock(&spinlock);
 			break;
 		}
 
 		number++;
 
-		wd_unspinlock(&spinlock);
+		self_unspinlock(&spinlock);
 	}
 
 	gettimeofday(&t_date->end, NULL);
