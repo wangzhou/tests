@@ -101,8 +101,8 @@ static int test_pin_page(struct file_priv *priv, struct test_pin_address *addr)
 	p->nr_pages = nr_pages;
 	p->pages = pages;
 
-	ret = xa_alloc(&priv->array, &p->first, p, xa_limit_32b, GFP_KERNEL);
-	if (ret < 0)
+	ret = xa_err(xa_store(&priv->array, p->first, p, GFP_KERNEL));
+	if (ret)
 		goto unpin_pages;
 
 	return 0;
