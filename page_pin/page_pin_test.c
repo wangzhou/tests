@@ -218,7 +218,7 @@ static int __init page_pin_init(void)
                 return -1;
         }
 
-        device_create(class, NULL, dev_id, NULL, "page_pin" "%d", 0);
+        device_create(class, NULL, dev_id, NULL, "page_pin");
 
         return 0;
 }

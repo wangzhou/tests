@@ -15,7 +15,7 @@ struct test_pin_address {
 
 int main()
 {
-	unsigned long size = 2 * 1024 * 1024;
+	unsigned long size = 2 * 4096;
 	unsigned long *p;
 	struct test_pin_address addr;
 	int fd, ret;
@@ -27,8 +27,8 @@ int main()
 		return -1;
 	}
 
-	fd = open("/dev/pin_pages", O_RDWR);
-	if (fd) {
+	fd = open("/dev/page_pin", O_RDWR);
+	if (fd < 0) {
 		perror("fail to open\n");
 		return -1;
 	}
