@@ -1,50 +1,53 @@
-#include <fcntl.h>
-#include <signal.h>
 #include <stdio.h>
+#include <sys/mman.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+struct test_pin_address {
+	unsigned long addr;
+	unsigned long size;
+};
+
+#define TEST_PIN		_IOW('W', 0, struct test_pin_address)
+#define TEST_UNPIN		_IOW('W', 1, struct test_pin_address)
 
 int main()
 {
-	unsigned long num = 0;
-	int fd, ret;	
+	unsigned long size = 2 * 1024 * 1024;
+	unsigned long *p;
+	struct test_pin_address addr;
+	int fd, ret;
 
-	sigset_t set, old_set;
-
-	if (sigemptyset(&set) == -1 || sigemptyset(&old_set) == -1) {
-		printf("u fasync: fail to empty sig set\n");
-		return -4;
-	}
-
-	if (sigaddset(&set, SIGIO) == -1) {
-		printf("u fasync: fail to add sigio to set\n");
-		return -5;
-	}
-
-	if (sigprocmask(SIG_UNBLOCK, &set, &old_set) == -1) {
-		printf("u fasync: fail to unmask sigio\n");
-		return -6;
-	}
-
-	fd = open("/dev/fasync0", O_RDWR | O_CLOEXEC);
-	if (fd == -1) {
-		printf("u fasync: fail to open /dev/fasync0\n");
+	p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+		 MAP_ANONYMOUS, -1, 0);
+	if (p == MAP_FAILED) {
+		perror("fail to do mmap\n");
 		return -1;
 	}
 
-	ret = fcntl(fd, F_SETOWN, getpid());
-	if (ret == -1) {
-		printf("u fasync: fail to bind process\n");
-		return -2;
+	fd = open("/dev/pin_pages", O_RDWR);
+	if (fd) {
+		perror("fail to open\n");
+		return -1;
 	}
 
-	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | FASYNC);
-	if (ret == -1) {
-		printf("u fasync: fail to set fasync\n");
-		return -3;
+	addr.addr = (unsigned long)p;
+	addr.size = size;
+	ret = ioctl(fd, TEST_PIN, &addr);
+	if (ret < 0) {
+		perror("fail to pin\n");
+		return -1;
 	}
-	
-	while (1) {
-		num++;
+
+	/* todo: add sleep to check */
+
+	ret = ioctl(fd, TEST_UNPIN, &addr);
+	if (ret < 0) {
+		perror("fail to unpin\n");
+		return -1;
 	}
+
+	return 0;
 }
