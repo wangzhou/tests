@@ -69,7 +69,7 @@ int test_release(struct inode *inode, struct file *file)
 
 static int test_pin_page(struct file_priv *priv, struct test_pin_address *addr)
 {
-	unsigned int flags = FOLL_FORCE;
+	unsigned int flags = FOLL_FORCE | FOLL_WRITE;
 	unsigned long first, last, nr_pages;
 	struct page **pages;
 	struct pin_pages *p;
