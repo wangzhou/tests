@@ -4,12 +4,12 @@
 
 int main()
 {
-	int len = 2 * 1024 * 1024;
+	int len = 128 * 1024;
 	unsigned long *p;
 	int i;
 
 	p = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_PRIVATE |
-		 MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+		 MAP_ANONYMOUS | MAP_HUGETLB | (16 << 26), -1, 0);
 	if (p == MAP_FAILED) {
 		perror("fail to allocate huge page\n");
 		return -1;
