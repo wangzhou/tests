@@ -1,36 +1,53 @@
 #include <stdio.h>
-#include <sys/queue.h>
 #include <stdlib.h>
+#include <sys/queue.h>
 
-struct entry {
+struct your_list_node {
 	int data;
-	TAILQ_ENTRY(entry) entries;
+	TAILQ_ENTRY(your_list_node) node;
 };
-TAILQ_HEAD(list_head, entry);	
+TAILQ_HEAD(list_head, your_list_node);	
 
 int main()
 {
 	struct list_head head;
 	TAILQ_INIT(&head);
-	struct entry *e1, *e2, *e3, *tmp;
 
-	e1 = malloc(sizeof(struct entry));
-	e1->data = 2;
-	TAILQ_INSERT_TAIL(&head, e1, entries);
+	struct your_list_node e1, e2, e3, e4, e5, *tmp;
 
-	e2 = malloc(sizeof(struct entry));
-	e2->data = 3;
-	TAILQ_INSERT_TAIL(&head, e2, entries);
+	e1.data = 1;
+	TAILQ_INSERT_TAIL(&head, &e1, node);
 
-	e3 = malloc(sizeof(struct entry));
-	e3->data = 4;
-	TAILQ_INSERT_TAIL(&head, e3, entries);
+	e2.data = 2;
+	TAILQ_INSERT_TAIL(&head, &e2, node);
 
-	TAILQ_FOREACH(tmp, &head, entries) {
+	e3.data = 3;
+	TAILQ_INSERT_TAIL(&head, &e3, node);
+
+	e4.data = 4;
+	TAILQ_INSERT_TAIL(&head, &e4, node);
+
+	TAILQ_FOREACH(tmp, &head, node) {
 		printf("---> %d\n", tmp->data);
 	}
+	printf("\n");
+
+	e5.data = 5;
+	TAILQ_INSERT_BEFORE(&e4, &e5, node);
+
+	TAILQ_FOREACH(tmp, &head, node) {
+		printf("---> %d\n", tmp->data);
+	}
+	printf("\n");
+
+	tmp = TAILQ_LAST(&head, list_head);
+	printf("last: %d\n\n", tmp->data);
+
+	TAILQ_REMOVE(&head, &e2, node);
+	TAILQ_FOREACH(tmp, &head, node) {
+		printf("---> %d\n", tmp->data);
+	}
+	printf("\n");
 
 	return 0;	
 }
-
-1. free list
