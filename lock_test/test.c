@@ -26,11 +26,15 @@ struct thread_data {
 	struct timeval begin;
 	struct timeval end;
 	struct test_option *opt;
+	long long *number;
 };
 
 typedef void *(*thread_fun)(void *);
 
-long long number = 0;
+long long number __attribute__((aligned(64))) = 0;
+long long number_2 __attribute__((aligned(64))) = 0;
+//long long number = 0;
+//long long number_2 = 0;
 struct self_spinlock spinlock;
 pthread_mutex_t mutexlock = PTHREAD_MUTEX_INITIALIZER;
 pthread_spinlock_t p_spinlock = 0;
@@ -140,12 +144,12 @@ static void *test_pthread_spinlock(void *data)
 	while (1) {
 		pthread_spin_lock(&p_spinlock);
 
-		if (number == total) {
+		if (*(t_date->number) == total) {
 			pthread_spin_unlock(&p_spinlock);
 			break;
 		}
 
-		number++;
+		(*(t_date->number))++;
 
 		pthread_spin_unlock(&p_spinlock);
 	}
@@ -157,9 +161,12 @@ int main(int argc, char *argv[])
 {
 	struct thread_data *thread_data_array, *tmp;
 	struct test_option opt = {0};
-	long long time = 0;
+	long long time = 0, time_ops;
 	thread_fun fun;
 	cpu_set_t mask;
+	struct timeval begin;
+	struct timeval end;
+	float ops;
 	int i;
 
 	parse_cmd_line(argc, argv, &opt);
@@ -181,8 +188,12 @@ int main(int argc, char *argv[])
 		fun = test_pthread_spinlock;
 	}
 
-	for (i = 0; i < opt.thread_num; i++)
+	for (i = 0; i < opt.thread_num; i++) {
 		thread_data_array[i].opt = &opt;
+		thread_data_array[i].number = ((i == 0) ? &number : &number_2);
+	}
+
+	gettimeofday(&begin, NULL);
 
 	/* start test */
 	for (i = 0; i < opt.thread_num; i++) {
@@ -201,6 +212,12 @@ int main(int argc, char *argv[])
 	for (i = 0; i < opt.thread_num; i++) {
 		pthread_join(thread_data_array[i].p, NULL);
 	}
+
+	gettimeofday(&end, NULL);
+	time_ops = ((end.tv_sec - begin.tv_sec) * 1000000 +
+		    (end.tv_usec - begin.tv_usec));
+	ops = (float)opt.total / opt.thread_num / time_ops * 1000000 / (1024 * 1024);
+	printf("ops is %f M/s\n", ops);
 
 	/* get test result */
 	for (i = 0; i < opt.thread_num; i++) {
