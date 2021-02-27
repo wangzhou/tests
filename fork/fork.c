@@ -15,6 +15,7 @@ int main()
 		printf("fail to fork\n");
 	} else if (pid == 0) {
 		printf("in child process %d\n", count);
+		printf("in child process %d\n", count);
 	} else {
 		printf("in father process %d\n", count);
 	}

@@ -52,5 +52,9 @@ int main()
 			break;
 	}
 
+	char *ss = "wang";
+	char *ss_r = strchr(ss, 'a');
+	printf("strchr test: %s\n", ss_r);
+
 	return 0;
 }
