@@ -2,7 +2,7 @@
 
 for i in `seq $1`
 do
-	numactl --cpubind=3 --membind=3 ./a.out &
+	taskset 0xffff00000000 ./a.out &
 	pid_array[$i]=$!
 	echo ${pid_array[$i]}
 done
