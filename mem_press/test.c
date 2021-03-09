@@ -25,7 +25,7 @@ int main()
 	}
 #endif
 //#if 0
-	for (i = 0; i < 100000000; i++) {
+//	for (i = 0; i < 100000000; i++) {
 		p = mmap(NULL, MEM_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 			 -1, 0);
 		if (p == MAP_FAILED) {
@@ -39,11 +39,11 @@ int main()
 			exit(1);
 		}
 #endif
-//	for (i = 0; i < 100000000; i++)
+	for (i = 0; i < 100000000; i++)
 		memset(p, 3, MEM_SIZE);
 
 		munmap(p, MEM_SIZE);
-	}
+//	}
 //#endif
 	return 0;
 }

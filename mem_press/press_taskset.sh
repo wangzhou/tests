@@ -2,7 +2,7 @@
 
 for i in `seq $1`
 do
-	taskset 0xffff00000000 ./a.out &
+	taskset -c 32-47 ./a.out &
 	pid_array[$i]=$!
 	echo ${pid_array[$i]}
 done
