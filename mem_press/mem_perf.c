@@ -34,6 +34,7 @@ int main()
 	speed = (unsigned long)TEST_TIME * MEM_SIZE / tc / 1024 / 1024 * 1000000;
 
 	printf("---> speed is %0.3f MB/s\n", speed);
+	printf("---> time is %0.3f s\n", tc / 1000000);
 
 	munmap(p, MEM_SIZE);
 

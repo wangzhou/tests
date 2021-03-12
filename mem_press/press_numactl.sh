@@ -2,7 +2,8 @@
 
 for i in `seq $1`
 do
-	numactl -C 32-47 --membind=1 ./a.out &
+	numactl -C 32-47 --membind=1 ./test_lma &
+#	numactl -C 32-47 --membind=1 ./a.out &
 #	numactl -C 96-127 --membind=1 ./a.out &
 	pid_array[$i]=$!
 	echo ${pid_array[$i]}
