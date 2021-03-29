@@ -1,0 +1,248 @@
+From 23216003c0111440648dc2ef01e30becf593663c Mon Sep 17 00:00:00 2001
+From: Zhou Wang <wangzhou1@hisilicon.com>
+Date: Tue, 2 Mar 2021 02:56:38 +0000
+Subject: [PATCH] add multi threads..., not finish
+
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ test/hisi_zip_test/test_lib.c      | 42 +++++++++++------
+ test/hisi_zip_test/test_lib.h      |  7 +++
+ test/hisi_zip_test/test_sva_perf.c | 96 ++++++++++++++++++++++++++++----------
+ 3 files changed, 106 insertions(+), 39 deletions(-)
+
+diff --git a/test/hisi_zip_test/test_lib.c b/test/hisi_zip_test/test_lib.c
+index 1f2ece0..44d493b 100644
+--- a/test/hisi_zip_test/test_lib.c
++++ b/test/hisi_zip_test/test_lib.c
+@@ -401,7 +401,8 @@ static void *async_cb(struct wd_comp_req *req, void *data)
+ 
+ void *send_thread_func(void *arg)
+ {
+-	struct hizip_test_info *info = (struct hizip_test_info *)arg;
++	struct hizip_test_thread_data *tmp = arg;
++	struct hizip_test_info *info = tmp->info;
+ 	struct test_options *opts = info->opts;
+ 	size_t src_block_size, dst_block_size;
+ 	handle_t h_sess = info->h_sess;
+@@ -419,15 +420,15 @@ void *send_thread_func(void *arg)
+ 
+ 	for (j = 0; j < opts->compact_run_num; j++) {
+ 		if (opts->option & TEST_ZLIB) {
+-			ret = zlib_deflate(info->out_buf, info->out_size,
+-					   info->in_buf, info->in_size,
++			ret = zlib_deflate(tmp->out_buf, info->out_size,
++					   tmp->in_buf, info->in_size,
+ 					   &info->total_out, opts->alg_type);
+ 			continue;
+ 		}
+ 		/* not TEST_ZLIB */
+ 		left = opts->total_len;
+-		info->req.src = info->in_buf;
+-		info->req.dst = info->out_buf;
++		info->req.src = tmp->in_buf;
++		info->req.dst = tmp->out_buf;
+ 		while (left > 0) {
+ 			info->req.src_len = src_block_size;
+ 			info->req.dst_len = dst_block_size;
+@@ -535,11 +536,11 @@ static void *poll_thread_func(void *arg)
+ int create_threads(struct hizip_test_info *info)
+ {
+ 	pthread_attr_t attr;
+-	int ret;
++	int ret, i;
+ 
+ 	count = 0;
+ 	info->thread_attached = 0;
+-	info->thread_nums = 2;
++	info->thread_nums = info->opts.thread_num + 1;
+ 	info->threads = calloc(1, info->thread_nums * sizeof(pthread_t));
+ 	if (!info->threads)
+ 		return -ENOMEM;
+@@ -551,24 +552,37 @@ int create_threads(struct hizip_test_info *info)
+ 		WD_ERR("fail to create poll thread (%d)\n", ret);
+ 		return ret;
+ 	}
+-	ret = pthread_create(&info->threads[1], &attr, send_thread_func, info);
+-	if (ret < 0)
+-		return ret;
++
++	for (i = 0; i < info->opts.thread_num; i++) {
++		ret = pthread_create(&info->threads[i], &attr,
++				     send_thread_func,
++				     info->thead_data_array + i);
++		if (ret < 0)
++			/* fix me: destory threads? */
++			return ret;
++	}
++
+ 	pthread_attr_destroy(&attr);
++	/* fix me: remove this？*/
+ 	g_conf = &info->ctx_conf;
++
+ 	return 0;
+ }
+ 
+ int attach_threads(struct hizip_test_info *info)
+ {
+-	int ret;
++	int ret, i;
+ 	void *tret;
+ 
+ 	if (info->thread_attached)
+ 		return 0;
+-	ret = pthread_join(info->threads[1], &tret);
+-	if (ret < 0)
+-		WD_ERR("Fail on send thread with %d\n", ret);
++
++	for (i = 0; i < info->opts.thread_num; i++) {
++		ret = pthread_join(info->threads[i + 1], &tret);
++		if (ret < 0)
++			WD_ERR("Fail on send thread with %d\n", ret);
++	}
++
+ 	ret = pthread_join(info->threads[0], NULL);
+ 	if (ret < 0)
+ 		WD_ERR("Fail on poll thread with %d\n", ret);
+diff --git a/test/hisi_zip_test/test_lib.h b/test/hisi_zip_test/test_lib.h
+index 499df63..7494ef6 100644
+--- a/test/hisi_zip_test/test_lib.h
++++ b/test/hisi_zip_test/test_lib.h
+@@ -80,6 +80,12 @@ struct test_options {
+ 
+ };
+ 
++struct hizip_test_thread_data {
++	char *in_buf;
++	char *out_buf;
++	struct hizip_test_info *info;
++};
++
+ struct hizip_test_info {
+ 	struct test_options *opts;
+ 	char *in_buf, *out_buf;
+@@ -92,6 +98,7 @@ struct hizip_test_info {
+ 	int thread_nums;
+ 	int thread_attached;
+ 	pthread_t *threads;
++	struct hizip_test_thread_data *thread_data_array;
+ 	struct hizip_stats *stats;
+ 	struct {
+ 		struct timespec setup_time;
+diff --git a/test/hisi_zip_test/test_sva_perf.c b/test/hisi_zip_test/test_sva_perf.c
+index a6576d2..c2ad42c 100644
+--- a/test/hisi_zip_test/test_sva_perf.c
++++ b/test/hisi_zip_test/test_sva_perf.c
+@@ -308,6 +308,73 @@ static void stat_end(struct hizip_test_info *info)
+ 	stats->v[ST_FAULTS] = stats->v[ST_MAJFLT] + stats->v[ST_MINFLT];
+ }
+ 
++static void free_comp_data(struct hizip_test_info *info)
++{
++	struct hizip_test_thread_data *tmp = info->thead_data_array;
++	size_t defl_size = info->opts.total_len * EXPANSION_RATIO;
++	size_t infl_size = info->opts.total_len;
++	int thread_num = info->opts.thread_num;
++	int i;
++
++	for (i = 0; i < thread_num; i++) {
++		if (!tmp->in_buf)
++			break;
++
++		munmap(tmp->out_buf, defl_size);
++		munmap(tmp->in_buf, infl_size)
++
++		tmp++;
++	}
++}
++
++static int create_comp_data(struct hizip_test_info *info)
++{
++	int thread_num = info->opts.thread_num;
++	struct hizip_test_thread_data *tmp;
++	void *defl_buf, *infl_buf;
++	/*
++	 * Counter-intuitive: defl_size > infl_size, because random data is
++	 * incompressible and deflate may add a header. See comment in
++	 * hizip_prepare_random_input_data().
++	 */
++	size_t defl_size = info->opts.total_len * EXPANSION_RATIO;
++	size_t infl_size = info->opts.total_len;
++	int i, ret;
++
++	info->thread_data_array = calloc(thread_num, sizeof(*tmp));
++	if (!info->thread_data_array)
++		return -ENOMEM;
++
++	for (i = 0; i < thread_num; i++) {
++		tmp = info->thread_data_array + i;
++		tmp->in_buf = mmap_alloc(infl_size);
++		if (!tmp->in_buf) {
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		tmp->out_buf = mmap_alloc(defl_size);
++		if (!tmp->out_buf) {
++			ret = -ENOMEM;
++			goto free_in_buf;
++		}
++
++		hizip_prepare_random_input_data(tmp->in_buf, infl_size,
++						info->opts.block_size);
++		tmp->info = info;
++	}
++
++	return 0;
++
++free_in_buf:
++	free(tmp->in_buf);
++	tmp->in_buf = NULL;
++out:
++	free_comp_data(info);
++	free(info->thread_data_array);
++	return ret;
++}
++
+ static int run_one_test(struct test_options *opts, struct hizip_stats *stats)
+ {
+ 	static bool event_unavailable;
+@@ -328,32 +395,11 @@ static int run_one_test(struct test_options *opts, struct hizip_stats *stats)
+ 	if (!info.list)
+ 		return -EINVAL;
+ 
+-	infl_size = opts->total_len;
+-	infl_buf = mmap_alloc(infl_size);
+-	if (!infl_buf) {
+-		ret = -ENOMEM;
+-		goto out_list;
+-	}
+-
+-	/*
+-	 * Counter-intuitive: defl_size > infl_size, because random data is
+-	 * incompressible and deflate may add a header. See comment in
+-	 * hizip_prepare_random_input_data().
+-	 */
+-	defl_size = opts->total_len * EXPANSION_RATIO;
+-	defl_buf = mmap_alloc(defl_size);
+-	if (!defl_buf) {
+-		ret = -ENOMEM;
+-		goto out_with_infl_buf;
+-	}
+-
++	/* hack: only for comp alg */
+ 	if (opts->op_type == WD_DIR_COMPRESS) {
+-		hizip_prepare_random_input_data(infl_buf, infl_size,
+-						opts->block_size);
+-		info.in_buf = infl_buf;
+-		info.in_size = infl_size;
+-		info.out_buf = defl_buf;
+-		info.out_size = defl_size;
++		ret = create_comp_data(info);
++		if (ret)
++			goto out_list;
+ 	} else {
+ 		size_t produced;
+ 
+-- 
+2.7.4
+
