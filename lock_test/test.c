@@ -96,12 +96,12 @@ static void *test_thread_spinlock(void *data)
 	while (1) {
 		self_spinlock(&spinlock);
 
-		if (number == total) {
+		if (*(t_date->number) == total) {
 			self_unspinlock(&spinlock);
 			break;
 		}
 
-		number++;
+		(*(t_date->number))++;
 
 		self_unspinlock(&spinlock);
 	}
@@ -120,12 +120,12 @@ static void *test_thread_mutexlock(void *data)
 	while (1) {
 		pthread_mutex_lock(&mutexlock);
 
-		if (number == total) {
+		if (*(t_date->number) == total) {
 			pthread_mutex_unlock(&mutexlock);
 			break;
 		}
 
-		number++;
+		(*(t_date->number))++;
 
 		pthread_mutex_unlock(&mutexlock);
 	}
@@ -190,7 +190,8 @@ int main(int argc, char *argv[])
 
 	for (i = 0; i < opt.thread_num; i++) {
 		thread_data_array[i].opt = &opt;
-		thread_data_array[i].number = ((i == 0) ? &number : &number_2);
+		/* you can add different value for different threads */
+		thread_data_array[i].number = &number;
 	}
 
 	gettimeofday(&begin, NULL);
