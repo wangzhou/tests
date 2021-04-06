@@ -4,6 +4,7 @@
 int main()
 {
 	int i = numa_max_node();
+	int nodes[i + 1];
 
 	printf("max node: %d\n", i);
 

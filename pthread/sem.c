@@ -72,12 +72,13 @@ void *enqueue_msg(void *data)
 				cur = cur->m_next;
 			cur->m_next = mp;
 		}
-		sleep(1);
+		//sleep(1);
 		printf("---> input msg val: 0x%lx\n", mp->val);
 		dump_list(workq);
 
 		pthread_mutex_unlock(&qlock);
 
+		sleep(1);
 		if (sem_post(&sem))
 			exit(-2);
 	}

@@ -57,6 +57,7 @@ void *enqueue_msg(void *data)
 		printf("---> input msg val: 0x%lx\n", mp->val);
 
 		pthread_mutex_unlock(&qlock);
+		sleep(1);
 		pthread_cond_signal(&qready);
 	}
 }
