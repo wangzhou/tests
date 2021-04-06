@@ -22,7 +22,7 @@ void *process_msg(void *data)
 	struct msg *mp;
 
 	printf("---> process thread starts\n");
-	sleep(3);
+//	sleep(3);
 	
 	while (1) {
 		if (sem_wait(&sem))
@@ -86,7 +86,7 @@ void *enqueue_msg(void *data)
 int main()
 {
 	pthread_t t1, t2;
-	if (sem_init(&sem, 0, 100))
+	if (sem_init(&sem, 0, 0))
 		exit(-4);
 	cpu_set_t cpuset;
 
