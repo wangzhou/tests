@@ -18,11 +18,22 @@ void add_user(int user_id, char *name)
 {
     struct my_struct *s;
 
-    HASH_FIND_INT(users, &user_id, s);  /* 查看user_id为key的数据是否存在，返回数据的指针，s为NULL，数据不存在 */
+    /*
+     * 查看user_id为key的数据是否存在，返回数据的指针，s为NULL，数据不存在。
+     * 注意，user_id就是key的值，这个接口实现的比较特别，单通过这个接口内部的
+     * 实现根本不知道内部的那个数据是key。
+     *
+     * 这个接口要配合下面的HASH_ADD_INT来用。这个接口的语义是：
+     * 用s里的id为key插入s到users，这里这个id表示的是struct my_struct里的id这个
+     * 参数名字，所以一定要写的和struct my_struct里的id一样，本质上是一个字符。
+     *
+     * HASH_FIND_INT也是根据HASH_ADD_INT里的id知道key是s里的那个元素。
+     */
+    HASH_FIND_INT(users, &user_id, s);
     if (s == NULL) {
         s = (struct my_struct*)malloc(sizeof(struct my_struct));
         s->id = user_id;
-        HASH_ADD_INT(users, id, s);  /* user_id为key插入s到users */
+        HASH_ADD_INT(users, id, s);  /* 用s里的id为key插入s到users */
     }
     strcpy(s->name, name);
 }
