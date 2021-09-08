@@ -7,6 +7,7 @@
 #define is_valid(i, tail)	((i) < (tail))
 
 #define E_FULL			(-1)
+#define DEBUG
 
 /*
  * data1 value <  data2 value, return < 0
@@ -54,6 +55,9 @@ void swap(void **data1, void **data2)
 /* do as bigger value priority */
 int pri_q_insert(struct pri_q *pri_q, void *data)
 {
+#ifdef DEBUG
+	printf("--> debug: insert %ld\n", (long)data);
+#endif
 	int i = pri_q->tail;
 	void **q = pri_q->q;
 
@@ -82,7 +86,12 @@ void *pri_q_get(struct pri_q *pri_q)
 		return NULL;
 
 	ret = q[0];
+#ifdef DEBUG
+	printf("--> debug: get %ld\n", (long)ret);
+#endif
 	swap(&q[0], &q[tail - 1]);
+	pri_q->tail--;
+	tail--;
 
 	while (is_valid(get_left(i), tail) && pri_q->comp(q[i], q[get_left(i)]) < 0 ||
 	       is_valid(get_right(i), tail) && pri_q->comp(q[i], q[get_right(i)]) < 0) {
@@ -112,36 +121,42 @@ void pri_q_release(struct pri_q *pri_q)
 	free(pri_q);
 }
 
-void pri_q_print_int(struct pri_q *pri_q)
+void pri_q_print_long(struct pri_q *pri_q)
 {
 	void **q = pri_q->q;
 	int i;
 
-	for (i = 0; i < pri_q->length; i++)
-		printf("%d ", (int)q[i]);
+	for (i = 0; i < pri_q->tail; i++)
+		printf("%ld ", (long)q[i]);
 
 	printf("\n");
 }
 
-int comp_int(void *data1, void *data2)
+int comp_long(void *data1, void *data2)
 {
-	return (int)data1 - (int)data2;
+	return (long)data1 - (long)data2;
 }
 
 int main()
 {
 	struct pri_q *h_q;
 
-	h_q = pri_q_create(20, comp_int);
+	h_q = pri_q_create(20, comp_long);
 
-	pri_q_insert(h_q, 1);
-	pri_q_insert(h_q, 2);
-	pri_q_insert(h_q, 3);
-	pri_q_insert(h_q, 4);
+	pri_q_insert(h_q, (void *)2);
+	pri_q_insert(h_q, (void *)4);
+	pri_q_insert(h_q, (void *)6);
+	pri_q_insert(h_q, (void *)8);
+	pri_q_print_long(h_q);
 
-	pri_q_print_int(h_q);
+	pri_q_get(h_q);
+	pri_q_print_long(h_q);
+
+	pri_q_insert(h_q, (void *)7);
+	pri_q_print_long(h_q);
 
 	pri_q_release(h_q);
+
 
 	return 0;
 }
