@@ -95,8 +95,10 @@ static gboolean key_equal(gconstpointer v1, gconstpointer v2)
 int main()
 {
     	GHashTable *hash_table;
-	value v, *p_v;
+    	GHashTable *int_table;
+	value v, *p_v, *p;
 	key k, *p_k;
+	int int_k = 2;
 
     	hash_table = g_hash_table_new_full(key_hash, key_equal, g_free, g_free);
 
@@ -120,7 +122,18 @@ int main()
 		printf("not found!\n");
 
 	g_hash_table_remove_all(hash_table);
-	
+
+	/* start to test g_int_hash */
+    	int_table = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, g_free);
+	p_v = malloc(sizeof(v)); p_v->base = 1; p_v->bar = 3;
+	g_hash_table_insert(int_table, &int_k, p_v);
+	p = g_hash_table_lookup(int_table, &int_k);
+	if (p)
+		printf("found!\n");
+	else
+		printf("not found!\n");
+	g_hash_table_remove_all(int_table);
+
 	return 0;
 }
 
