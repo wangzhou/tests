@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <malloc.h>
 
 #define get_left(i)		(2 * (i) + 1)
 #define get_right(i)		(2 * (i) + 2)
 #define get_father(i)		((i) % 2 ? (i) / 2 : (i) / 2 - 1)
+#define is_valid(i, tail)	((i) < (tail))
+
+#define E_FULL			(-1)
 
 /*
  * data1 value <  data2 value, return < 0
@@ -38,46 +42,64 @@ struct pri_q *pri_q_create(int length, comp_fun comp)
 	return ret;
 }
 
-void swap(void *data1, void *data2)
+void swap(void **data1, void **data2)
 {
 	void *tmp;
 
-	tmp = data1;
-	data1 = data2;
-	data2 = tmp;
+	tmp = *data1;
+	*data1 = *data2;
+	*data2 = tmp;
 }
 
 /* do as bigger value priority */
-void pri_q_insert(struct pri_q *pri_q, void *data)
+int pri_q_insert(struct pri_q *pri_q, void *data)
 {
-	assert(pri_q->tail < pri_q->length - 1);
 	int i = pri_q->tail;
+	void **q = pri_q->q;
 
-	pri_q->q[pri_q->tail] = data;
+	if (i >= pri_q->length - 1)
+		return E_FULL;
+
+	q[i] = data;
 	pri_q->tail++;
 
-	while (i && pri_q->comp(data, pri_q->q[get_father(i)])) {
-		swap(pri_q->q[i], pri_q->q[get_father(i)]);
+	while (i && pri_q->comp(data, q[get_father(i)])) {
+		swap(&q[i], &q[get_father(i)]);
 		i = get_father(i);
 	}
+
+	return 0;
 }
 
 void *pri_q_get(struct pri_q *pri_q)
 {
-	void *ret = pri_q->q[0];
+	void **q = pri_q->q;
 	int i = 0, j;
- 
-	swap(pri_q->q[0], pri_q->q[pri_q->tail]);
+	int tail = pri_q->tail;
+	void *ret;
 
-	/* fixme: should have child, need check */
-	while (pri_q->comp(pri_q->q[i], pri_q->q[get_left(i)]) < 0 ||
-	       pri_q->comp(pri_q->q[i], pri_q->q[get_right(i)]) < 0) {
-		if (pri_q->q[get_left(i)] > pri_q->q[get_right(i)])
+	if (!tail)
+		return NULL;
+
+	ret = q[0];
+	swap(&q[0], &q[tail - 1]);
+
+	while (is_valid(get_left(i), tail) && pri_q->comp(q[i], q[get_left(i)]) < 0 ||
+	       is_valid(get_right(i), tail) && pri_q->comp(q[i], q[get_right(i)]) < 0) {
+
+		if (is_valid(get_left(i), tail) && is_valid(get_right(i), tail)) {
+			if (q[get_left(i)] > q[get_right(i)])
+				j = get_left(i);
+			else
+				j = get_right(i);
+		} else if (is_valid(get_left(i), tail)) {
 			j = get_left(i);
-		else
+		} else {
 			j = get_right(i);
+		}
 
-		swap(pri_q->comp(pri_q->q[i], pri_q->q[i]);
+		swap(&q[i], &q[j]);
+		i = j;
 	}
 
 	return ret;
@@ -90,9 +112,36 @@ void pri_q_release(struct pri_q *pri_q)
 	free(pri_q);
 }
 
+void pri_q_print_int(struct pri_q *pri_q)
+{
+	void **q = pri_q->q;
+	int i;
+
+	for (i = 0; i < pri_q->length; i++)
+		printf("%d ", (int)q[i]);
+
+	printf("\n");
+}
+
+int comp_int(void *data1, void *data2)
+{
+	return (int)data1 - (int)data2;
+}
+
 int main()
 {
-	/* test case */
+	struct pri_q *h_q;
+
+	h_q = pri_q_create(20, comp_int);
+
+	pri_q_insert(h_q, 1);
+	pri_q_insert(h_q, 2);
+	pri_q_insert(h_q, 3);
+	pri_q_insert(h_q, 4);
+
+	pri_q_print_int(h_q);
+
+	pri_q_release(h_q);
 
 	return 0;
 }
