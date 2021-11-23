@@ -1,0 +1,6 @@
+/home/wangzhou/tests/cmake/CMakeFiles/rebuild_cache.dir
+/home/wangzhou/tests/cmake/CMakeFiles/edit_cache.dir
+/home/wangzhou/tests/cmake/CMakeFiles/hello.dir
+/home/wangzhou/tests/cmake/lib/CMakeFiles/rebuild_cache.dir
+/home/wangzhou/tests/cmake/lib/CMakeFiles/edit_cache.dir
+/home/wangzhou/tests/cmake/lib/CMakeFiles/add.dir
