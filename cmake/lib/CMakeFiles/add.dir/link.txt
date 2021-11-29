@@ -1,1 +1,1 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,libadd.so -o libadd.so CMakeFiles/add.dir/add.o 
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libadd.so -o libadd.so CMakeFiles/add.dir/add.c.o 

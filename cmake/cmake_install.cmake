@@ -1,4 +1,4 @@
-# Install script for directory: /home/wangzhou/tests/cmake
+# Install script for directory: /home/sherlock/tests/cmake
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,9 +38,8 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for each subdirectory.
-  include("/home/wangzhou/tests/cmake/lib/cmake_install.cmake")
-
+  # Include the install script for the subdirectory.
+  include("/home/sherlock/tests/cmake/lib/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -51,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/wangzhou/tests/cmake/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/sherlock/tests/cmake/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

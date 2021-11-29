@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/wangzhou/tests/cmake/hello.c" "/home/wangzhou/tests/cmake/CMakeFiles/hello.dir/hello.o"
+  "/home/sherlock/tests/cmake/hello.c" "/home/sherlock/tests/cmake/CMakeFiles/hello.dir/hello.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 
@@ -14,7 +14,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/wangzhou/tests/cmake/lib/CMakeFiles/add.dir/DependInfo.cmake"
+  "/home/sherlock/tests/cmake/lib/CMakeFiles/add.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

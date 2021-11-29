@@ -1,1 +1,1 @@
-/usr/bin/cc   -rdynamic CMakeFiles/hello.dir/hello.o  -o hello  -Wl,-rpath,/home/wangzhou/tests/cmake/lib lib/libadd.so 
+/usr/bin/cc   -L/opt CMakeFiles/hello.dir/hello.c.o  -o hello  -Wl,-rpath,/home/sherlock/tests/cmake/lib lib/libadd.so -lnuma 

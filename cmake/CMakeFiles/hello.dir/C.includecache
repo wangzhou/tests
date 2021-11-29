@@ -6,15 +6,19 @@
 
 #IncludeRegexTransform: 
 
-/home/wangzhou/tests/cmake/hello.c
+/home/sherlock/tests/cmake/hello.c
 stdio.h
 -
+math.h
+-
+numa.h
+-
 hello.h
-/home/wangzhou/tests/cmake/hello.h
+/home/sherlock/tests/cmake/hello.h
 ./lib/add.h
-/home/wangzhou/tests/cmake/lib/add.h
+/home/sherlock/tests/cmake/lib/add.h
 
-/home/wangzhou/tests/cmake/hello.h
+/home/sherlock/tests/cmake/hello.h
 
-/home/wangzhou/tests/cmake/lib/add.h
+/home/sherlock/tests/cmake/lib/add.h
 

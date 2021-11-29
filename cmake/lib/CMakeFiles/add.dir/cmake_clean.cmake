@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/add.dir/add.o"
+  "CMakeFiles/add.dir/add.c.o"
   "libadd.pdb"
   "libadd.so"
 )

@@ -1,4 +1,4 @@
-# Install script for directory: /home/wangzhou/tests/cmake/lib
+# Install script for directory: /home/sherlock/tests/cmake/lib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

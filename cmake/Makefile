@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/wangzhou/tests/cmake
+CMAKE_SOURCE_DIR = /home/sherlock/tests/cmake
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/wangzhou/tests/cmake
+CMAKE_BINARY_DIR = /home/sherlock/tests/cmake
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles /home/wangzhou/tests/cmake/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles /home/sherlock/tests/cmake/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -136,20 +136,32 @@ add/fast:
 	$(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/build
 .PHONY : add/fast
 
-# target to build an object file
-hello.o:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.o
+hello.o: hello.c.o
+
 .PHONY : hello.o
 
-# target to preprocess a source file
-hello.i:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.i
+# target to build an object file
+hello.c.o:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.c.o
+.PHONY : hello.c.o
+
+hello.i: hello.c.i
+
 .PHONY : hello.i
 
-# target to generate assembly for a file
-hello.s:
-	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.s
+# target to preprocess a source file
+hello.c.i:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.c.i
+.PHONY : hello.c.i
+
+hello.s: hello.c.s
+
 .PHONY : hello.s
+
+# target to generate assembly for a file
+hello.c.s:
+	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/hello.c.s
+.PHONY : hello.c.s
 
 # Help Target
 help:

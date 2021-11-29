@@ -44,10 +44,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/wangzhou/tests/cmake
+CMAKE_SOURCE_DIR = /home/sherlock/tests/cmake
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/wangzhou/tests/cmake
+CMAKE_BINARY_DIR = /home/sherlock/tests/cmake
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -94,14 +94,14 @@ lib/clean: lib/CMakeFiles/add.dir/clean
 CMakeFiles/hello.dir/all: lib/CMakeFiles/add.dir/all
 	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/depend
 	$(MAKE) -f CMakeFiles/hello.dir/build.make CMakeFiles/hello.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/wangzhou/tests/cmake/CMakeFiles --progress-num=3,4 "Built target hello"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/sherlock/tests/cmake/CMakeFiles --progress-num=3,4 "Built target hello"
 .PHONY : CMakeFiles/hello.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/hello.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/hello.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 0
 .PHONY : CMakeFiles/hello.dir/rule
 
 # Convenience name for target.
@@ -121,14 +121,14 @@ CMakeFiles/hello.dir/clean:
 lib/CMakeFiles/add.dir/all:
 	$(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/depend
 	$(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/wangzhou/tests/cmake/CMakeFiles --progress-num=1,2 "Built target add"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/sherlock/tests/cmake/CMakeFiles --progress-num=1,2 "Built target add"
 .PHONY : lib/CMakeFiles/add.dir/all
 
 # Build rule for subdir invocation for target.
 lib/CMakeFiles/add.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/add.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 0
 .PHONY : lib/CMakeFiles/add.dir/rule
 
 # Convenience name for target.

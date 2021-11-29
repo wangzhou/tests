@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/wangzhou/tests/cmake/lib/add.c" "/home/wangzhou/tests/cmake/lib/CMakeFiles/add.dir/add.o"
+  "/home/sherlock/tests/cmake/lib/add.c" "/home/sherlock/tests/cmake/lib/CMakeFiles/add.dir/add.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

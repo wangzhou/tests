@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/wangzhou/tests/cmake
+CMAKE_SOURCE_DIR = /home/sherlock/tests/cmake
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/wangzhou/tests/cmake
+CMAKE_BINARY_DIR = /home/sherlock/tests/cmake
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/wangzhou/tests/cmake && $(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles /home/wangzhou/tests/cmake/lib/CMakeFiles/progress.marks
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/wangzhou/tests/cmake/CMakeFiles 0
+	cd /home/sherlock/tests/cmake && $(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles /home/sherlock/tests/cmake/lib/CMakeFiles/progress.marks
+	cd /home/sherlock/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/sherlock/tests/cmake/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/clean
+	cd /home/sherlock/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
+	cd /home/sherlock/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
+	cd /home/sherlock/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/wangzhou/tests/cmake && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/sherlock/tests/cmake && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 lib/CMakeFiles/add.dir/rule:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/add.dir/rule
+	cd /home/sherlock/tests/cmake && $(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/add.dir/rule
 .PHONY : lib/CMakeFiles/add.dir/rule
 
 # Convenience name for target.
@@ -122,23 +122,35 @@ add: lib/CMakeFiles/add.dir/rule
 
 # fast build rule for target.
 add/fast:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/build
+	cd /home/sherlock/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/build
 .PHONY : add/fast
 
-# target to build an object file
-add.o:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.o
+add.o: add.c.o
+
 .PHONY : add.o
 
-# target to preprocess a source file
-add.i:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.i
+# target to build an object file
+add.c.o:
+	cd /home/sherlock/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.c.o
+.PHONY : add.c.o
+
+add.i: add.c.i
+
 .PHONY : add.i
 
-# target to generate assembly for a file
-add.s:
-	cd /home/wangzhou/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.s
+# target to preprocess a source file
+add.c.i:
+	cd /home/sherlock/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.c.i
+.PHONY : add.c.i
+
+add.s: add.c.s
+
 .PHONY : add.s
+
+# target to generate assembly for a file
+add.c.s:
+	cd /home/sherlock/tests/cmake && $(MAKE) -f lib/CMakeFiles/add.dir/build.make lib/CMakeFiles/add.dir/add.c.s
+.PHONY : add.c.s
 
 # Help Target
 help:
@@ -163,6 +175,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/wangzhou/tests/cmake && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/sherlock/tests/cmake && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
