@@ -1,27 +1,49 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 
-int main(void)
+
+bool is_zhishu(int a)
 {
-	int a = 0, b, i;
-
-	printf("桃桃，请输入一个数: ");
-	scanf("%d", &a);
+	int i, b;
 
 	b = sqrt(a);
 	
-	printf("b是：%d\n", b);
-
 	for (i = 2; i <= b; i++) {
-		printf("检测：%d 除以 %d\n", a, i);
 		if (a % i == 0) {
-			printf("%d 不是质数！可以被%d整除\n", a, i);
-			return 0;
+			return false;
 		}
 	}
 
-	printf("%d 是质数！\n", a);
+	return true;
+}
 
+int main(void)
+{
+	int a = 0, i, j = 1, b = 0;
+	int flag = 0;
+
+	printf("桃桃，请输入两个数, 我会为你输出这两个数之间的所有质数: ");
+	scanf("%d %d", &a, &b);
+
+	for (i = a; i <=b; i++) {
+		if (is_zhishu(i)) {
+			flag = 1;
+			printf("%d ", i);
+			j++;
+		}
+
+		if (j % 21 == 0) {
+			j = 1;
+			printf("\n");
+		}
+	}
+	
+	if (!flag)
+		printf("没有质数");
+
+	printf("\n");
+ 
 	return 0;
 }
 
