@@ -1,0 +1,866 @@
+PROLOGUE: [size=76]
+0xffff9c000000:  a9ba7bfd  stp      x29, x30, [sp, #-0x60]!
+0xffff9c000004:  910003fd  mov      x29, sp
+0xffff9c000008:  a90153f3  stp      x19, x20, [sp, #0x10]
+0xffff9c00000c:  a9025bf5  stp      x21, x22, [sp, #0x20]
+0xffff9c000010:  a90363f7  stp      x23, x24, [sp, #0x30]
+0xffff9c000014:  a9046bf9  stp      x25, x26, [sp, #0x40]
+0xffff9c000018:  a90573fb  stp      x27, x28, [sp, #0x50]
+0xffff9c00001c:  d11203ff  sub      sp, sp, #0x480
+0xffff9c000020:  aa0003f3  mov      x19, x0
+0xffff9c000024:  d61f0020  br       x1
+0xffff9c000028:  52800000  mov      w0, #0
+0xffff9c00002c:  911203ff  add      sp, sp, #0x480
+0xffff9c000030:  a94153f3  ldp      x19, x20, [sp, #0x10]
+0xffff9c000034:  a9425bf5  ldp      x21, x22, [sp, #0x20]
+0xffff9c000038:  a94363f7  ldp      x23, x24, [sp, #0x30]
+0xffff9c00003c:  a9446bf9  ldp      x25, x26, [sp, #0x40]
+0xffff9c000040:  a94573fb  ldp      x27, x28, [sp, #0x50]
+0xffff9c000044:  a8c67bfd  ldp      x29, x30, [sp], #0x60
+0xffff9c000048:  d65f03c0  ret      
+
+----------------
+IN: main
+0x0000000000010172:  1101              addi            sp,sp,-32
+0x0000000000010174:  ec06              sd              ra,24(sp)
+0x0000000000010176:  e822              sd              s0,16(sp)
+0x0000000000010178:  e426              sd              s1,8(sp)
+0x000000000001017a:  1000              addi            s0,sp,32
+0x000000000001017c:  4085              addi            ra,zero,1
+0x000000000001017e:  408d              addi            ra,zero,3
+0x0000000000010180:  4491              addi            s1,zero,4
+0x0000000000010182:  00001797          auipc           a5,4096         # 0x11182
+0x0000000000010186:  05e7b783          ld              a5,94(a5)
+0x000000000001018a:  439c              lw              a5,0(a5)
+0x000000000001018c:  2785              addiw           a5,a5,1
+0x000000000001018e:  2781              sext.w          a5,a5
+0x0000000000010190:  80be              mv              ra,a5
+0x0000000000010192:  0089              addi            ra,ra,2
+0x0000000000010194:  00308493          addi            s1,ra,3
+0x0000000000010198:  0000879b          sext.w          a5,ra
+0x000000000001019c:  0004871b          sext.w          a4,s1
+0x00000000000101a0:  85ba              mv              a1,a4
+0x00000000000101a2:  853e              mv              a0,a5
+0x00000000000101a4:  fa1ff0ef          jal             ra,-96          # 0x10144
+
+OP:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 0000000000010172 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffe0
+
+ ---- 0000000000010174 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18
+ qemu_st_i64 x1/ra,tmp4,leq,0
+
+ ---- 0000000000010176 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10
+ qemu_st_i64 x8/s0,tmp4,leq,0
+
+ ---- 0000000000010178 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8
+ qemu_st_i64 x9/s1,tmp4,leq,0
+
+ ---- 000000000001017a 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x20
+
+ ---- 000000000001017c 0000000000000000
+ add_i64 x1/ra,$0x0,$0x1
+
+ ---- 000000000001017e 0000000000000000
+ add_i64 x1/ra,$0x0,$0x3
+
+ ---- 0000000000010180 0000000000000000
+ add_i64 x9/s1,$0x0,$0x4
+
+ ---- 0000000000010182 0000000000000000
+ mov_i64 x15/a5,$0x11182
+
+ ---- 0000000000010186 0000000000000000
+ add_i64 tmp4,x15/a5,$0x5e
+ qemu_ld_i64 x15/a5,tmp4,leq,0
+
+ ---- 000000000001018a 0000000000000000
+ mov_i64 tmp4,x15/a5
+ qemu_ld_i64 x15/a5,tmp4,lesl,0
+
+ ---- 000000000001018c 0000000000000000
+ add_i64 tmp4,x15/a5,$0x1
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 000000000001018e 0000000000000000
+ mov_i64 tmp4,x15/a5
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 0000000000010190 0000000000000000
+ mov_i64 x1/ra,x15/a5
+
+ ---- 0000000000010192 0000000000000000
+ add_i64 x1/ra,x1/ra,$0x2
+
+ ---- 0000000000010194 0000000000000000
+ add_i64 x9/s1,x1/ra,$0x3
+
+ ---- 0000000000010198 0000000000000000
+ mov_i64 tmp4,x1/ra
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 000000000001019c 0000000000000000
+ mov_i64 tmp4,x9/s1
+ ext32s_i64 x14/a4,tmp4
+
+ ---- 00000000000101a0 0000000000000000
+ mov_i64 x11/a1,x14/a4
+
+ ---- 00000000000101a2 0000000000000000
+ mov_i64 x10/a0,x15/a5
+
+ ---- 00000000000101a4 0000000000000000
+ mov_i64 x1/ra,$0x101a8
+ goto_tb $0x0
+ mov_i64 pc,$0x10144
+ exit_tb $0xffff9c000080
+ set_label $L0
+ exit_tb $0xffff9c000083
+
+OP before liveness_pass_1:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 0000000000010172 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffe0
+
+ ---- 0000000000010174 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18
+ qemu_st_i64 x1/ra,tmp4,leq,0
+
+ ---- 0000000000010176 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10
+ qemu_st_i64 x8/s0,tmp4,leq,0
+
+ ---- 0000000000010178 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8
+ qemu_st_i64 x9/s1,tmp4,leq,0
+
+ ---- 000000000001017a 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x20
+
+ ---- 000000000001017c 0000000000000000
+ mov_i64 x1/ra,$0x1
+
+ ---- 000000000001017e 0000000000000000
+ mov_i64 x1/ra,$0x3
+
+ ---- 0000000000010180 0000000000000000
+ mov_i64 x9/s1,$0x4
+
+ ---- 0000000000010182 0000000000000000
+ mov_i64 x15/a5,$0x11182
+
+ ---- 0000000000010186 0000000000000000
+ mov_i64 tmp4,$0x111e0
+ qemu_ld_i64 x15/a5,$0x111e0,leq,0
+
+ ---- 000000000001018a 0000000000000000
+ mov_i64 tmp4,x15/a5
+ qemu_ld_i64 x15/a5,x15/a5,lesl,0
+
+ ---- 000000000001018c 0000000000000000
+ add_i64 tmp4,x15/a5,$0x1
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 000000000001018e 0000000000000000
+ mov_i64 tmp4,x15/a5
+
+ ---- 0000000000010190 0000000000000000
+ mov_i64 x1/ra,x15/a5
+
+ ---- 0000000000010192 0000000000000000
+ add_i64 x1/ra,x1/ra,$0x2
+
+ ---- 0000000000010194 0000000000000000
+ add_i64 x9/s1,x1/ra,$0x3
+
+ ---- 0000000000010198 0000000000000000
+ mov_i64 tmp4,x1/ra
+ ext32s_i64 x15/a5,x1/ra
+
+ ---- 000000000001019c 0000000000000000
+ mov_i64 tmp4,x9/s1
+ ext32s_i64 x14/a4,x9/s1
+
+ ---- 00000000000101a0 0000000000000000
+ mov_i64 x11/a1,x14/a4
+
+ ---- 00000000000101a2 0000000000000000
+ mov_i64 x10/a0,x15/a5
+
+ ---- 00000000000101a4 0000000000000000
+ mov_i64 x1/ra,$0x101a8
+ goto_tb $0x0
+ mov_i64 pc,$0x10144
+ exit_tb $0xffff9c000080
+ set_label $L0
+ exit_tb $0xffff9c000083
+
+OP after optimization and liveness analysis:
+ ld_i32 tmp1,env,$0xfffffffffffffff8      dead: 1  pref=0xffffffff
+ brcond_i32 tmp1,$0x0,lt,$L0              dead: 0 1
+
+ ---- 0000000000010172 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffe0  sync: 0  dead: 1 2  pref=0x3ff80000
+
+ ---- 0000000000010174 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18                 dead: 2  pref=0xffffffff
+ qemu_st_i64 x1/ra,tmp4,leq,0             dead: 0 1
+
+ ---- 0000000000010176 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10                 dead: 2  pref=0xffffffff
+ qemu_st_i64 x8/s0,tmp4,leq,0             dead: 0 1
+
+ ---- 0000000000010178 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8                  dead: 2  pref=0xffffffff
+ qemu_st_i64 x9/s1,tmp4,leq,0             dead: 0 1
+
+ ---- 000000000001017a 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x20                sync: 0  dead: 0 1 2  pref=0xffffffff
+
+ ---- 000000000001017c 0000000000000000
+
+ ---- 000000000001017e 0000000000000000
+ mov_i64 x1/ra,$0x3                       sync: 0  dead: 0  pref=0xffffffff
+
+ ---- 0000000000010180 0000000000000000
+ mov_i64 x9/s1,$0x4                       sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 0000000000010182 0000000000000000
+ mov_i64 x15/a5,$0x11182                  sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 0000000000010186 0000000000000000
+ qemu_ld_i64 x15/a5,$0x111e0,leq,0        sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 000000000001018a 0000000000000000
+ qemu_ld_i64 x15/a5,x15/a5,lesl,0         dead: 1  pref=0xffffffff
+
+ ---- 000000000001018c 0000000000000000
+ add_i64 tmp4,x15/a5,$0x1                 dead: 1 2  pref=0xffffffff
+ ext32s_i64 x15/a5,tmp4                   dead: 1  pref=0xffffffff
+
+ ---- 000000000001018e 0000000000000000
+
+ ---- 0000000000010190 0000000000000000
+ mov_i64 x1/ra,x15/a5                     dead: 1  pref=0xffffffff
+
+ ---- 0000000000010192 0000000000000000
+ add_i64 x1/ra,x1/ra,$0x2                 dead: 1 2  pref=0xffffffff
+
+ ---- 0000000000010194 0000000000000000
+ add_i64 x9/s1,x1/ra,$0x3                 sync: 0  dead: 2  pref=0xffffffff
+
+ ---- 0000000000010198 0000000000000000
+ ext32s_i64 x15/a5,x1/ra                  sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 000000000001019c 0000000000000000
+ ext32s_i64 x14/a4,x9/s1                  sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 00000000000101a0 0000000000000000
+ mov_i64 x11/a1,x14/a4                    sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101a2 0000000000000000
+ mov_i64 x10/a0,x15/a5                    sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101a4 0000000000000000
+ mov_i64 x1/ra,$0x101a8                   sync: 0  dead: 0 1  pref=0xffffffff
+ goto_tb $0x0                           
+ mov_i64 pc,$0x10144                      sync: 0  dead: 0 1  pref=0xffffffff
+ exit_tb $0xffff9c000080                
+ set_label $L0                          
+ exit_tb $0xffff9c000083                
+
+OUT: [size=216]
+  -- guest addr 0x0000000000010172 + tb prologue
+0xffff9c000140:  b85f8274  ldur     w20, [x19, #-8]
+0xffff9c000144:  7100029f  cmp      w20, #0
+0xffff9c000148:  5400064b  b.lt     #0xffff9c000210
+0xffff9c00014c:  f9400a74  ldr      x20, [x19, #0x10]
+0xffff9c000150:  d1008294  sub      x20, x20, #0x20
+0xffff9c000154:  f9000a74  str      x20, [x19, #0x10]
+  -- guest addr 0x0000000000010174
+0xffff9c000158:  91006295  add      x21, x20, #0x18
+0xffff9c00015c:  f9400676  ldr      x22, [x19, #8]
+0xffff9c000160:  f83f6ab6  str      x22, [x21, xzr]
+  -- guest addr 0x0000000000010176
+0xffff9c000164:  91004295  add      x21, x20, #0x10
+0xffff9c000168:  f9402276  ldr      x22, [x19, #0x40]
+0xffff9c00016c:  f83f6ab6  str      x22, [x21, xzr]
+  -- guest addr 0x0000000000010178
+0xffff9c000170:  91002295  add      x21, x20, #8
+0xffff9c000174:  f9402676  ldr      x22, [x19, #0x48]
+0xffff9c000178:  f83f6ab6  str      x22, [x21, xzr]
+  -- guest addr 0x000000000001017a
+0xffff9c00017c:  91008294  add      x20, x20, #0x20
+0xffff9c000180:  f9002274  str      x20, [x19, #0x40]
+  -- guest addr 0x000000000001017e
+0xffff9c000184:  52800074  mov      w20, #3
+0xffff9c000188:  f9000674  str      x20, [x19, #8]
+  -- guest addr 0x0000000000010180
+0xffff9c00018c:  52800094  mov      w20, #4
+0xffff9c000190:  f9002674  str      x20, [x19, #0x48]
+  -- guest addr 0x0000000000010182
+0xffff9c000194:  52823054  mov      w20, #0x1182
+0xffff9c000198:  72a00034  movk     w20, #1, lsl #16
+0xffff9c00019c:  f9003e74  str      x20, [x19, #0x78]
+  -- guest addr 0x0000000000010186
+0xffff9c0001a0:  52823c14  mov      w20, #0x11e0
+0xffff9c0001a4:  72a00034  movk     w20, #1, lsl #16
+0xffff9c0001a8:  f87f6a94  ldr      x20, [x20, xzr]
+0xffff9c0001ac:  f9003e74  str      x20, [x19, #0x78]
+  -- guest addr 0x000000000001018a
+0xffff9c0001b0:  b8bf6a94  ldrsw    x20, [x20, xzr]
+  -- guest addr 0x000000000001018c
+0xffff9c0001b4:  91000694  add      x20, x20, #1
+0xffff9c0001b8:  93407e94  sxtw     x20, w20
+  -- guest addr 0x0000000000010192
+0xffff9c0001bc:  91000a94  add      x20, x20, #2
+  -- guest addr 0x0000000000010194
+0xffff9c0001c0:  91000e95  add      x21, x20, #3
+0xffff9c0001c4:  f9002675  str      x21, [x19, #0x48]
+  -- guest addr 0x0000000000010198
+0xffff9c0001c8:  93407e94  sxtw     x20, w20
+0xffff9c0001cc:  f9003e74  str      x20, [x19, #0x78]
+  -- guest addr 0x000000000001019c
+0xffff9c0001d0:  93407eb5  sxtw     x21, w21
+0xffff9c0001d4:  f9003a75  str      x21, [x19, #0x70]
+  -- guest addr 0x00000000000101a0
+0xffff9c0001d8:  f9002e75  str      x21, [x19, #0x58]
+  -- guest addr 0x00000000000101a2
+0xffff9c0001dc:  f9002a74  str      x20, [x19, #0x50]
+  -- guest addr 0x00000000000101a4
+0xffff9c0001e0:  52803514  mov      w20, #0x1a8
+0xffff9c0001e4:  72a00034  movk     w20, #1, lsl #16
+0xffff9c0001e8:  f9000674  str      x20, [x19, #8]
+0xffff9c0001ec:  d503201f  nop      
+0xffff9c0001f0:  9000001e  adrp     x30, #0xffff9c000000
+0xffff9c0001f4:  910003de  add      x30, x30, #0
+0xffff9c0001f8:  d61f03c0  br       x30
+0xffff9c0001fc:  52802894  mov      w20, #0x144
+0xffff9c000200:  72a00034  movk     w20, #1, lsl #16
+0xffff9c000204:  f9099a74  str      x20, [x19, #0x1330]
+0xffff9c000208:  10fff3c0  adr      x0, #0xffff9c000080
+0xffff9c00020c:  17ffff88  b        #0xffff9c00002c
+0xffff9c000210:  70fff380  adr      x0, #0xffff9c000083
+0xffff9c000214:  17ffff86  b        #0xffff9c00002c
+
+----------------
+IN: add
+0x0000000000010144:  7179              addi            sp,sp,-48
+0x0000000000010146:  f422              sd              s0,40(sp)
+0x0000000000010148:  1800              addi            s0,sp,48
+0x000000000001014a:  87aa              mv              a5,a0
+0x000000000001014c:  872e              mv              a4,a1
+0x000000000001014e:  fcf42e23          sw              a5,-36(s0)
+0x0000000000010152:  87ba              mv              a5,a4
+0x0000000000010154:  fcf42c23          sw              a5,-40(s0)
+0x0000000000010158:  fdc42703          lw              a4,-36(s0)
+0x000000000001015c:  fd842783          lw              a5,-40(s0)
+0x0000000000010160:  9fb9              addw            a5,a5,a4
+0x0000000000010162:  fef42623          sw              a5,-20(s0)
+0x0000000000010166:  fec42783          lw              a5,-20(s0)
+0x000000000001016a:  853e              mv              a0,a5
+0x000000000001016c:  7422              ld              s0,40(sp)
+0x000000000001016e:  6145              addi            sp,sp,48
+0x0000000000010170:  8082              ret             
+
+OP:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 0000000000010144 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffd0
+
+ ---- 0000000000010146 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28
+ qemu_st_i64 x8/s0,tmp4,leq,0
+
+ ---- 0000000000010148 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x30
+
+ ---- 000000000001014a 0000000000000000
+ mov_i64 x15/a5,x10/a0
+
+ ---- 000000000001014c 0000000000000000
+ mov_i64 x14/a4,x11/a1
+
+ ---- 000000000001014e 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010152 0000000000000000
+ mov_i64 x15/a5,x14/a4
+
+ ---- 0000000000010154 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010158 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc
+ qemu_ld_i64 x14/a4,tmp4,lesl,0
+
+ ---- 000000000001015c 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8
+ qemu_ld_i64 x15/a5,tmp4,lesl,0
+
+ ---- 0000000000010160 0000000000000000
+ add_i64 tmp4,x15/a5,x14/a4
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 0000000000010162 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010166 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec
+ qemu_ld_i64 x15/a5,tmp4,lesl,0
+
+ ---- 000000000001016a 0000000000000000
+ mov_i64 x10/a0,x15/a5
+
+ ---- 000000000001016c 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28
+ qemu_ld_i64 x8/s0,tmp4,leq,0
+
+ ---- 000000000001016e 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x30
+
+ ---- 0000000000010170 0000000000000000
+ mov_i64 pc,x1/ra
+ and_i64 pc,pc,$0xfffffffffffffffe
+ call lookup_tb_ptr,$0x6,$1,tmp4,env
+ goto_ptr tmp4
+ set_label $L0
+ exit_tb $0xffff9c000283
+
+OP before liveness_pass_1:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 0000000000010144 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffd0
+
+ ---- 0000000000010146 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28
+ qemu_st_i64 x8/s0,tmp4,leq,0
+
+ ---- 0000000000010148 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x30
+
+ ---- 000000000001014a 0000000000000000
+ mov_i64 x15/a5,x10/a0
+
+ ---- 000000000001014c 0000000000000000
+ mov_i64 x14/a4,x11/a1
+
+ ---- 000000000001014e 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010152 0000000000000000
+ mov_i64 x15/a5,x14/a4
+
+ ---- 0000000000010154 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010158 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc
+ qemu_ld_i64 x14/a4,tmp4,lesl,0
+
+ ---- 000000000001015c 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8
+ qemu_ld_i64 x15/a5,tmp4,lesl,0
+
+ ---- 0000000000010160 0000000000000000
+ add_i64 tmp4,x15/a5,x14/a4
+ ext32s_i64 x15/a5,tmp4
+
+ ---- 0000000000010162 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec
+ qemu_st_i64 x15/a5,tmp4,leul,0
+
+ ---- 0000000000010166 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec
+ qemu_ld_i64 x15/a5,tmp4,lesl,0
+
+ ---- 000000000001016a 0000000000000000
+ mov_i64 x10/a0,x15/a5
+
+ ---- 000000000001016c 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28
+ qemu_ld_i64 x8/s0,tmp4,leq,0
+
+ ---- 000000000001016e 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x30
+
+ ---- 0000000000010170 0000000000000000
+ mov_i64 pc,x1/ra
+ and_i64 pc,pc,$0xfffffffffffffffe
+ call lookup_tb_ptr,$0x6,$1,tmp4,env
+ goto_ptr tmp4
+ set_label $L0
+ exit_tb $0xffff9c000283
+
+OP after optimization and liveness analysis:
+ ld_i32 tmp1,env,$0xfffffffffffffff8      pref=0xffffffff
+ brcond_i32 tmp1,$0x0,lt,$L0              dead: 0 1
+
+ ---- 0000000000010144 0000000000000000
+ add_i64 x2/sp,x2/sp,$0xffffffffffffffd0  sync: 0  dead: 1 2  pref=0x3ff80000
+
+ ---- 0000000000010146 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28                 pref=0xffffffff
+ qemu_st_i64 x8/s0,tmp4,leq,0             dead: 0 1
+
+ ---- 0000000000010148 0000000000000000
+ add_i64 x8/s0,x2/sp,$0x30                sync: 0  pref=0x3ff80000
+
+ ---- 000000000001014a 0000000000000000
+ mov_i64 x15/a5,x10/a0                    sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 000000000001014c 0000000000000000
+ mov_i64 x14/a4,x11/a1                    sync: 0  dead: 1  pref=0x3ff80000
+
+ ---- 000000000001014e 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc   pref=0xffffffff
+ qemu_st_i64 x15/a5,tmp4,leul,0           dead: 0 1
+
+ ---- 0000000000010152 0000000000000000
+ mov_i64 x15/a5,x14/a4                    sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 0000000000010154 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8   pref=0xffffffff
+ qemu_st_i64 x15/a5,tmp4,leul,0           dead: 0 1
+
+ ---- 0000000000010158 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffdc   dead: 2  pref=0xffffffff
+ qemu_ld_i64 x14/a4,tmp4,lesl,0           sync: 0  dead: 1  pref=0x3ff80000
+
+ ---- 000000000001015c 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffd8   dead: 2  pref=0xffffffff
+ qemu_ld_i64 x15/a5,tmp4,lesl,0           dead: 1  pref=0xffffffff
+
+ ---- 0000000000010160 0000000000000000
+ add_i64 tmp4,x15/a5,x14/a4               dead: 1 2  pref=0xffffffff
+ ext32s_i64 x15/a5,tmp4                   sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 0000000000010162 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec   pref=0xffffffff
+ qemu_st_i64 x15/a5,tmp4,leul,0           dead: 0 1
+
+ ---- 0000000000010166 0000000000000000
+ add_i64 tmp4,x8/s0,$0xffffffffffffffec   dead: 1 2  pref=0xffffffff
+ qemu_ld_i64 x15/a5,tmp4,lesl,0           sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 000000000001016a 0000000000000000
+ mov_i64 x10/a0,x15/a5                    sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 000000000001016c 0000000000000000
+ add_i64 tmp4,x2/sp,$0x28                 dead: 2  pref=0xffffffff
+ qemu_ld_i64 x8/s0,tmp4,leq,0             sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 000000000001016e 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x30                sync: 0  dead: 0 1 2  pref=0xffffffff
+
+ ---- 0000000000010170 0000000000000000
+ mov_i64 pc,x1/ra                         dead: 1  pref=0xffffffff
+ and_i64 pc,pc,$0xfffffffffffffffe        sync: 0  dead: 0 1 2  pref=0xffffffff
+ call lookup_tb_ptr,$0x6,$1,tmp4,env      dead: 1  pref=none
+ goto_ptr tmp4                            dead: 0
+ set_label $L0                          
+ exit_tb $0xffff9c000283                
+
+OUT: [size=200]
+  -- guest addr 0x0000000000010144 + tb prologue
+0xffff9c000340:  b85f8274  ldur     w20, [x19, #-8]
+0xffff9c000344:  7100029f  cmp      w20, #0
+0xffff9c000348:  5400058b  b.lt     #0xffff9c0003f8
+0xffff9c00034c:  f9400a74  ldr      x20, [x19, #0x10]
+0xffff9c000350:  d100c294  sub      x20, x20, #0x30
+0xffff9c000354:  f9000a74  str      x20, [x19, #0x10]
+  -- guest addr 0x0000000000010146
+0xffff9c000358:  9100a295  add      x21, x20, #0x28
+0xffff9c00035c:  f9402276  ldr      x22, [x19, #0x40]
+0xffff9c000360:  f83f6ab6  str      x22, [x21, xzr]
+  -- guest addr 0x0000000000010148
+0xffff9c000364:  9100c295  add      x21, x20, #0x30
+0xffff9c000368:  f9002275  str      x21, [x19, #0x40]
+  -- guest addr 0x000000000001014a
+0xffff9c00036c:  f9402a76  ldr      x22, [x19, #0x50]
+0xffff9c000370:  f9003e76  str      x22, [x19, #0x78]
+  -- guest addr 0x000000000001014c
+0xffff9c000374:  f9402e77  ldr      x23, [x19, #0x58]
+0xffff9c000378:  f9003a77  str      x23, [x19, #0x70]
+  -- guest addr 0x000000000001014e
+0xffff9c00037c:  d10092b8  sub      x24, x21, #0x24
+0xffff9c000380:  b83f6b16  str      w22, [x24, xzr]
+  -- guest addr 0x0000000000010152
+0xffff9c000384:  f9003e77  str      x23, [x19, #0x78]
+  -- guest addr 0x0000000000010154
+0xffff9c000388:  d100a2b6  sub      x22, x21, #0x28
+0xffff9c00038c:  b83f6ad7  str      w23, [x22, xzr]
+  -- guest addr 0x0000000000010158
+0xffff9c000390:  d10092b6  sub      x22, x21, #0x24
+0xffff9c000394:  b8bf6ad6  ldrsw    x22, [x22, xzr]
+0xffff9c000398:  f9003a76  str      x22, [x19, #0x70]
+  -- guest addr 0x000000000001015c
+0xffff9c00039c:  d100a2b7  sub      x23, x21, #0x28
+0xffff9c0003a0:  b8bf6af7  ldrsw    x23, [x23, xzr]
+  -- guest addr 0x0000000000010160
+0xffff9c0003a4:  8b1602f6  add      x22, x23, x22
+0xffff9c0003a8:  93407ed6  sxtw     x22, w22
+0xffff9c0003ac:  f9003e76  str      x22, [x19, #0x78]
+  -- guest addr 0x0000000000010162
+0xffff9c0003b0:  d10052b7  sub      x23, x21, #0x14
+0xffff9c0003b4:  b83f6af6  str      w22, [x23, xzr]
+  -- guest addr 0x0000000000010166
+0xffff9c0003b8:  d10052b5  sub      x21, x21, #0x14
+0xffff9c0003bc:  b8bf6ab5  ldrsw    x21, [x21, xzr]
+0xffff9c0003c0:  f9003e75  str      x21, [x19, #0x78]
+  -- guest addr 0x000000000001016a
+0xffff9c0003c4:  f9002a75  str      x21, [x19, #0x50]
+  -- guest addr 0x000000000001016c
+0xffff9c0003c8:  9100a295  add      x21, x20, #0x28
+0xffff9c0003cc:  f87f6ab5  ldr      x21, [x21, xzr]
+0xffff9c0003d0:  f9002275  str      x21, [x19, #0x40]
+  -- guest addr 0x000000000001016e
+0xffff9c0003d4:  9100c294  add      x20, x20, #0x30
+0xffff9c0003d8:  f9000a74  str      x20, [x19, #0x10]
+  -- guest addr 0x0000000000010170
+0xffff9c0003dc:  f9400674  ldr      x20, [x19, #8]
+0xffff9c0003e0:  927ffa94  and      x20, x20, #0xfffffffffffffffe
+0xffff9c0003e4:  f9099a74  str      x20, [x19, #0x1330]
+0xffff9c0003e8:  aa1303e0  mov      x0, x19
+0xffff9c0003ec:  580000be  ldr      x30, #0xffff9c000400
+0xffff9c0003f0:  d63f03c0  blr      x30
+0xffff9c0003f4:  d61f0000  br       x0
+0xffff9c0003f8:  70fff440  adr      x0, #0xffff9c000283
+0xffff9c0003fc:  17ffff0c  b        #0xffff9c00002c
+  data: [size=8]
+0xffff9c000400:  .quad  0x0000aaaab3391468
+
+----------------
+IN: main
+0x00000000000101a8:  87aa              mv              a5,a0
+0x00000000000101aa:  873e              mv              a4,a5
+0x00000000000101ac:  00001797          auipc           a5,4096         # 0x111ac
+0x00000000000101b0:  0347b783          ld              a5,52(a5)
+0x00000000000101b4:  c398              sw              a4,0(a5)
+0x00000000000101b6:  4781              mv              a5,zero
+0x00000000000101b8:  853e              mv              a0,a5
+0x00000000000101ba:  60e2              ld              ra,24(sp)
+0x00000000000101bc:  6442              ld              s0,16(sp)
+0x00000000000101be:  64a2              ld              s1,8(sp)
+0x00000000000101c0:  6105              addi            sp,sp,32
+0x00000000000101c2:  8082              ret             
+
+OP:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 00000000000101a8 0000000000000000
+ mov_i64 x15/a5,x10/a0
+
+ ---- 00000000000101aa 0000000000000000
+ mov_i64 x14/a4,x15/a5
+
+ ---- 00000000000101ac 0000000000000000
+ mov_i64 x15/a5,$0x111ac
+
+ ---- 00000000000101b0 0000000000000000
+ add_i64 tmp4,x15/a5,$0x34
+ qemu_ld_i64 x15/a5,tmp4,leq,0
+
+ ---- 00000000000101b4 0000000000000000
+ mov_i64 tmp4,x15/a5
+ qemu_st_i64 x14/a4,tmp4,leul,0
+
+ ---- 00000000000101b6 0000000000000000
+ mov_i64 x15/a5,$0x0
+
+ ---- 00000000000101b8 0000000000000000
+ mov_i64 x10/a0,x15/a5
+
+ ---- 00000000000101ba 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18
+ qemu_ld_i64 x1/ra,tmp4,leq,0
+
+ ---- 00000000000101bc 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10
+ qemu_ld_i64 x8/s0,tmp4,leq,0
+
+ ---- 00000000000101be 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8
+ qemu_ld_i64 x9/s1,tmp4,leq,0
+
+ ---- 00000000000101c0 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x20
+
+ ---- 00000000000101c2 0000000000000000
+ mov_i64 pc,x1/ra
+ and_i64 pc,pc,$0xfffffffffffffffe
+ call lookup_tb_ptr,$0x6,$1,tmp4,env
+ goto_ptr tmp4
+ set_label $L0
+ exit_tb $0xffff9c000443
+
+OP before liveness_pass_1:
+ ld_i32 tmp1,env,$0xfffffffffffffff8
+ brcond_i32 tmp1,$0x0,lt,$L0
+
+ ---- 00000000000101a8 0000000000000000
+ mov_i64 x15/a5,x10/a0
+
+ ---- 00000000000101aa 0000000000000000
+ mov_i64 x14/a4,x15/a5
+
+ ---- 00000000000101ac 0000000000000000
+ mov_i64 x15/a5,$0x111ac
+
+ ---- 00000000000101b0 0000000000000000
+ mov_i64 tmp4,$0x111e0
+ qemu_ld_i64 x15/a5,$0x111e0,leq,0
+
+ ---- 00000000000101b4 0000000000000000
+ mov_i64 tmp4,x15/a5
+ qemu_st_i64 x14/a4,x15/a5,leul,0
+
+ ---- 00000000000101b6 0000000000000000
+ mov_i64 x15/a5,$0x0
+
+ ---- 00000000000101b8 0000000000000000
+ mov_i64 x10/a0,$0x0
+
+ ---- 00000000000101ba 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18
+ qemu_ld_i64 x1/ra,tmp4,leq,0
+
+ ---- 00000000000101bc 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10
+ qemu_ld_i64 x8/s0,tmp4,leq,0
+
+ ---- 00000000000101be 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8
+ qemu_ld_i64 x9/s1,tmp4,leq,0
+
+ ---- 00000000000101c0 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x20
+
+ ---- 00000000000101c2 0000000000000000
+ mov_i64 pc,x1/ra
+ and_i64 pc,pc,$0xfffffffffffffffe
+ call lookup_tb_ptr,$0x6,$1,tmp4,env
+ goto_ptr tmp4
+ set_label $L0
+ exit_tb $0xffff9c000443
+
+OP after optimization and liveness analysis:
+ ld_i32 tmp1,env,$0xfffffffffffffff8      pref=0xffffffff
+ brcond_i32 tmp1,$0x0,lt,$L0              dead: 0 1
+
+ ---- 00000000000101a8 0000000000000000
+ mov_i64 x15/a5,x10/a0                    dead: 1  pref=0xffffffff
+
+ ---- 00000000000101aa 0000000000000000
+ mov_i64 x14/a4,x15/a5                    sync: 0  dead: 1  pref=0x3ff80000
+
+ ---- 00000000000101ac 0000000000000000
+ mov_i64 x15/a5,$0x111ac                  sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101b0 0000000000000000
+ qemu_ld_i64 x15/a5,$0x111e0,leq,0        sync: 0  dead: 1  pref=0xffffffff
+
+ ---- 00000000000101b4 0000000000000000
+ qemu_st_i64 x14/a4,x15/a5,leul,0         dead: 0 1
+
+ ---- 00000000000101b6 0000000000000000
+ mov_i64 x15/a5,$0x0                      sync: 0  dead: 0  pref=0xffffffff
+
+ ---- 00000000000101b8 0000000000000000
+ mov_i64 x10/a0,$0x0                      sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101ba 0000000000000000
+ add_i64 tmp4,x2/sp,$0x18                 dead: 2  pref=0xffffffff
+ qemu_ld_i64 x1/ra,tmp4,leq,0             sync: 0  dead: 1  pref=0x3ff80000
+
+ ---- 00000000000101bc 0000000000000000
+ add_i64 tmp4,x2/sp,$0x10                 dead: 2  pref=0xffffffff
+ qemu_ld_i64 x8/s0,tmp4,leq,0             sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101be 0000000000000000
+ add_i64 tmp4,x2/sp,$0x8                  dead: 2  pref=0xffffffff
+ qemu_ld_i64 x9/s1,tmp4,leq,0             sync: 0  dead: 0 1  pref=0xffffffff
+
+ ---- 00000000000101c0 0000000000000000
+ add_i64 x2/sp,x2/sp,$0x20                sync: 0  dead: 0 1 2  pref=0xffffffff
+
+ ---- 00000000000101c2 0000000000000000
+ mov_i64 pc,x1/ra                         dead: 1  pref=0xffffffff
+ and_i64 pc,pc,$0xfffffffffffffffe        sync: 0  dead: 0 1 2  pref=0xffffffff
+ call lookup_tb_ptr,$0x6,$1,tmp4,env      dead: 1  pref=none
+ goto_ptr tmp4                            dead: 0
+ set_label $L0                          
+ exit_tb $0xffff9c000443                
+
+OUT: [size=152]
+  -- guest addr 0x00000000000101a8 + tb prologue
+0xffff9c000500:  b85f8274  ldur     w20, [x19, #-8]
+0xffff9c000504:  7100029f  cmp      w20, #0
+0xffff9c000508:  540003eb  b.lt     #0xffff9c000584
+0xffff9c00050c:  f9402a74  ldr      x20, [x19, #0x50]
+  -- guest addr 0x00000000000101aa
+0xffff9c000510:  f9003a74  str      x20, [x19, #0x70]
+  -- guest addr 0x00000000000101ac
+0xffff9c000514:  52823595  mov      w21, #0x11ac
+0xffff9c000518:  72a00035  movk     w21, #1, lsl #16
+0xffff9c00051c:  f9003e75  str      x21, [x19, #0x78]
+  -- guest addr 0x00000000000101b0
+0xffff9c000520:  52823c15  mov      w21, #0x11e0
+0xffff9c000524:  72a00035  movk     w21, #1, lsl #16
+0xffff9c000528:  f87f6ab5  ldr      x21, [x21, xzr]
+0xffff9c00052c:  f9003e75  str      x21, [x19, #0x78]
+  -- guest addr 0x00000000000101b4
+0xffff9c000530:  b83f6ab4  str      w20, [x21, xzr]
+  -- guest addr 0x00000000000101b6
+0xffff9c000534:  f9003e7f  str      xzr, [x19, #0x78]
+  -- guest addr 0x00000000000101b8
+0xffff9c000538:  f9002a7f  str      xzr, [x19, #0x50]
+  -- guest addr 0x00000000000101ba
+0xffff9c00053c:  f9400a74  ldr      x20, [x19, #0x10]
+0xffff9c000540:  91006295  add      x21, x20, #0x18
+0xffff9c000544:  f87f6ab5  ldr      x21, [x21, xzr]
+0xffff9c000548:  f9000675  str      x21, [x19, #8]
+  -- guest addr 0x00000000000101bc
+0xffff9c00054c:  91004296  add      x22, x20, #0x10
+0xffff9c000550:  f87f6ad6  ldr      x22, [x22, xzr]
+0xffff9c000554:  f9002276  str      x22, [x19, #0x40]
+  -- guest addr 0x00000000000101be
+0xffff9c000558:  91002296  add      x22, x20, #8
+0xffff9c00055c:  f87f6ad6  ldr      x22, [x22, xzr]
+0xffff9c000560:  f9002676  str      x22, [x19, #0x48]
+  -- guest addr 0x00000000000101c0
+0xffff9c000564:  91008294  add      x20, x20, #0x20
+0xffff9c000568:  f9000a74  str      x20, [x19, #0x10]
+  -- guest addr 0x00000000000101c2
+0xffff9c00056c:  927ffab4  and      x20, x21, #0xfffffffffffffffe
+0xffff9c000570:  f9099a74  str      x20, [x19, #0x1330]
+0xffff9c000574:  aa1303e0  mov      x0, x19
+0xffff9c000578:  580000de  ldr      x30, #0xffff9c000590
+0xffff9c00057c:  d63f03c0  blr      x30
+0xffff9c000580:  d61f0000  br       x0
+0xffff9c000584:  70fff5e0  adr      x0, #0xffff9c000443
+0xffff9c000588:  17fffea9  b        #0xffff9c00002c
+  -- tb slow paths + alignment
+0xffff9c00058c:  d503201f  nop      
+  data: [size=8]
+0xffff9c000590:  .quad  0x0000aaaab3391468
+
