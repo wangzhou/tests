@@ -1,11 +1,13 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdatomic.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #define Q_SIZE 100
-#define P_THREAD_NUM 2
-#define C_THREAD_NUM 2
-#define PUSH_NUM_PER_THREAD 100
+#define P_THREAD_NUM 4
+#define C_THREAD_NUM 4
+#define PUSH_NUM_PER_THREAD 1000
 #define TOTAL_NUM (PUSH_NUM_PER_THREAD * P_THREAD_NUM)
 
 #define Q_POS(count) ((count) % Q_SIZE)
@@ -18,15 +20,22 @@
  *       read      commit write
  */
 struct queue {
-	int data[Q_SIZE];	
-	atomic_int read_pos = ATOMIC_VAR_INIT(0);
-	atomic_int write_pos = ATOMIC_VAR_INIT(0);
-	atomic_int commit_pos = ATOMIC_VAR_INIT(0);
+	int data[Q_SIZE];
+	atomic_int read_pos;
+	atomic_int write_pos;
+	atomic_int commit_pos;
 };
 
 struct queue g_queue;
-pthread_t ptheads[P_THREAD_NUM + C_THREAD_NUM];
+pthread_t pthreads[P_THREAD_NUM + C_THREAD_NUM];
 atomic_int pop_num = ATOMIC_VAR_INIT(0);
+
+static void init(void)
+{
+	g_queue.read_pos = ATOMIC_VAR_INIT(0);
+	g_queue.write_pos = ATOMIC_VAR_INIT(0);
+	g_queue.commit_pos = ATOMIC_VAR_INIT(0);
+}
 
 /* return false if q is full */
 static bool push(struct queue *q, int data)
@@ -74,7 +83,7 @@ static bool pop(struct queue *q, int *data)
 			return true;
 		}
 
-	} while (1)
+	} while (1);
 }
 
 void *push_queue(void *d)
@@ -83,6 +92,7 @@ void *push_queue(void *d)
 
 	for (i = 0; i < PUSH_NUM_PER_THREAD; i++) {
 		while (!push(&g_queue, i));
+		//printf(">> push data: %d\n", i);
 	}
 }
 
@@ -93,11 +103,12 @@ void *pop_queue(void *d)
 	while (1) {
 		if (pop(&g_queue, &ret)) {
 			__atomic_fetch_add(&pop_num, 1, __ATOMIC_SEQ_CST);
+			//printf("<< pop data: %d\n", ret);
 		}
 
-		if (pop_num == TOTAL_NUM) {
-			break;
-		}
+//		if (pop_num == TOTAL_NUM) {
+//			break;
+//		}
 	}
 }
 
@@ -106,19 +117,25 @@ int main()
 	int i, p = 0;
 	pthread_t tmp;
 
+	init();
+
 	for (i = 0; i < P_THREAD_NUM; i++) {
 		pthread_create(&tmp, NULL, push_queue, NULL);
-		ptheads[p++] = tmp;
+		pthreads[p++] = tmp;
 	}
 
 	for (i = 0; i < C_THREAD_NUM; i++) {
 		pthread_create(&tmp, NULL, pop_queue, NULL);
-		ptheads[p++] = tmp;
+		pthreads[p++] = tmp;
 	}
+
+	sleep(5);
+	printf("pop total number: %d\n", pop_num);
 
 	for (i = 0; i < P_THREAD_NUM + C_THREAD_NUM; i++) {
 		pthread_join(pthreads[i], NULL);
 	}
+
 
 	return 0;
 }
