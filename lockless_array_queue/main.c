@@ -7,7 +7,7 @@
 #define Q_SIZE 100
 #define P_THREAD_NUM 4
 #define C_THREAD_NUM 4
-#define PUSH_NUM_PER_THREAD 1000
+#define PUSH_NUM_PER_THREAD 10000
 #define TOTAL_NUM (PUSH_NUM_PER_THREAD * P_THREAD_NUM)
 
 #define Q_POS(count) ((count) % Q_SIZE)
@@ -106,9 +106,9 @@ void *pop_queue(void *d)
 			//printf("<< pop data: %d\n", ret);
 		}
 
-//		if (pop_num == TOTAL_NUM) {
-//			break;
-//		}
+		if (pop_num == TOTAL_NUM) {
+			return NULL;
+		}
 	}
 }
 
@@ -129,13 +129,9 @@ int main()
 		pthreads[p++] = tmp;
 	}
 
-	sleep(5);
-	printf("pop total number: %d\n", pop_num);
-
 	for (i = 0; i < P_THREAD_NUM + C_THREAD_NUM; i++) {
 		pthread_join(pthreads[i], NULL);
 	}
-
 
 	return 0;
 }
