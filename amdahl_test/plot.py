@@ -28,10 +28,10 @@ with open("log") as f:
         work_num = w_num.group(1)
 
         if serial_ratio in data:
-            data[serial_ratio][pthread_num] = work_num
+            data[serial_ratio][pthread_num] = int(work_num)
         else:
             data[serial_ratio] = {}
-            data[serial_ratio][pthread_num] = work_num
+            data[serial_ratio][pthread_num] = int(work_num)
 
 # plot
 import matplotlib.pyplot as plt

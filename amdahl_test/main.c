@@ -8,9 +8,9 @@
 #include <getopt.h>
 #include <unistd.h>
 
-#define	WORK_ARRAY_NUM 10
-#define	WORK_ITER_NUM 10
-#define	WORK_POS(pos) ((pos) % WORK_ITER_NUM)
+#define	WORK_ARRAY_NUM 100
+#define	WORK_ITER_NUM 1000
+#define	WORK_POS(pos) ((pos) % WORK_ARRAY_NUM)
 
 static int pthread_num = 1;
 static int serial_ratio = 20; // 20%

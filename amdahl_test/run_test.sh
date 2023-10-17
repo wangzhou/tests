@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo > log
+cat /dev/null > log
 
-for r in $(seq 40 20 80)
+for r in $(seq 20 30 80)
 do
 	for n in $(seq 1 1 4)
 	do
-		./a.out --pthread_num=$n --serial_ratio=$r --working_time=1 >> log
+		./a.out --pthread_num=$n --serial_ratio=$r --working_time=2 >> log
 	done
 done
