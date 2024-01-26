@@ -1,0 +1,1 @@
+#define NUM 100

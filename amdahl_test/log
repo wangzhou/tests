@@ -1,0 +1,12 @@
+amdahl test result: pthread_num=1, serial_ratio=20, working_time=2, work_num=3241
+amdahl test result: pthread_num=2, serial_ratio=20, working_time=2, work_num=6374
+amdahl test result: pthread_num=3, serial_ratio=20, working_time=2, work_num=9239
+amdahl test result: pthread_num=4, serial_ratio=20, working_time=2, work_num=12279
+amdahl test result: pthread_num=1, serial_ratio=50, working_time=2, work_num=3299
+amdahl test result: pthread_num=2, serial_ratio=50, working_time=2, work_num=6352
+amdahl test result: pthread_num=3, serial_ratio=50, working_time=2, work_num=6166
+amdahl test result: pthread_num=4, serial_ratio=50, working_time=2, work_num=6162
+amdahl test result: pthread_num=1, serial_ratio=80, working_time=2, work_num=3293
+amdahl test result: pthread_num=2, serial_ratio=80, working_time=2, work_num=3990
+amdahl test result: pthread_num=3, serial_ratio=80, working_time=2, work_num=3857
+amdahl test result: pthread_num=4, serial_ratio=80, working_time=2, work_num=3859

@@ -42,6 +42,7 @@ static bool push(struct queue *q, int data)
 {
         int curr_write;
         int curr_read;
+	int exp_commit;
 
         do {
                 curr_write = __atomic_load_n(&q->write_pos, __ATOMIC_SEQ_CST);
@@ -55,8 +56,11 @@ static bool push(struct queue *q, int data)
 
         q->data[curr_write] = data;
 
-        while (!__atomic_compare_exchange_n(&q->commit_pos, &curr_write,
-	       Q_POS(curr_write + 1), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
+	exp_commit = curr_write;
+        while (!__atomic_compare_exchange_n(&q->commit_pos, &exp_commit,
+	       Q_POS(exp_commit + 1), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+		exp_commit = curr_write;
+	}
         
         return true;
 }
