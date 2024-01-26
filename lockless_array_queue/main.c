@@ -52,14 +52,14 @@ static bool push(struct queue *q, int data)
                         return false;
                 }
         } while (!__atomic_compare_exchange_n(&q->write_pos, &curr_write,
-		 Q_POS(curr_write + 1), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
+		 curr_write + 1, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 
-        q->data[curr_write] = data;
+        q->data[Q_POS(curr_write)] = data;
 
-	exp_commit = curr_write;
+	exp_commit = Q_POS(curr_write);
         while (!__atomic_compare_exchange_n(&q->commit_pos, &exp_commit,
 	       Q_POS(exp_commit + 1), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-		exp_commit = curr_write;
+		exp_commit = Q_POS(curr_write);
 	}
         
         return true;
@@ -80,9 +80,9 @@ static bool pop(struct queue *q, int *data)
 			return false;
 		}
 
-		tmp = q->data[curr_read];
+		tmp = q->data[Q_POS(curr_read)];
 		if (__atomic_compare_exchange_n(&q->read_pos, &curr_read,
-		    Q_POS(curr_read + 1), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+		    curr_read + 1, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
 			*data = tmp;
 			return true;
 		}
