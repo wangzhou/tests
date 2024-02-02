@@ -4,7 +4,8 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define Q_SIZE 100
+/* Note: Q_SIZE必须是2的幂次，否则存在bug */
+#define Q_SIZE 128
 #define P_THREAD_NUM 4
 #define C_THREAD_NUM 4
 #define PUSH_NUM_PER_THREAD 10000
@@ -21,9 +22,9 @@
  */
 struct queue {
 	int data[Q_SIZE];
-	atomic_int read_pos;
-	atomic_int write_pos;
-	atomic_int commit_pos;
+	atomic_uint read_pos;
+	atomic_uint write_pos;
+	atomic_uint commit_pos;
 };
 
 struct queue g_queue;
@@ -40,9 +41,9 @@ static void init(void)
 /* return false if q is full */
 static bool push(struct queue *q, int data)
 {
-        int curr_write;
-        int curr_read;
-	int exp_commit;
+        unsigned int curr_write;
+        unsigned int curr_read;
+	unsigned int exp_commit;
 
         do {
                 curr_write = __atomic_load_n(&q->write_pos, __ATOMIC_SEQ_CST);
@@ -54,7 +55,7 @@ static bool push(struct queue *q, int data)
         } while (!__atomic_compare_exchange_n(&q->write_pos, &curr_write,
 		 curr_write + 1, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 
-        q->data[Q_POS(curr_write)] = data;
+	__atomic_store(q->data + Q_POS(curr_write), &data, __ATOMIC_RELAXED);
 
 	exp_commit = Q_POS(curr_write);
         while (!__atomic_compare_exchange_n(&q->commit_pos, &exp_commit,
@@ -68,9 +69,9 @@ static bool push(struct queue *q, int data)
 /* return false if q is empty */
 static bool pop(struct queue *q, int *data)
 {
-        int curr_commit;
-        int curr_read;
-	int tmp;
+        unsigned int curr_commit;
+        unsigned int curr_read;
+	unsigned int tmp;
 
 	do {
 		curr_read = __atomic_load_n(&q->read_pos, __ATOMIC_SEQ_CST);
@@ -80,7 +81,7 @@ static bool pop(struct queue *q, int *data)
 			return false;
 		}
 
-		tmp = q->data[Q_POS(curr_read)];
+		__atomic_load(q->data + Q_POS(curr_read), &tmp, __ATOMIC_RELAXED);
 		if (__atomic_compare_exchange_n(&q->read_pos, &curr_read,
 		    curr_read + 1, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
 			*data = tmp;
