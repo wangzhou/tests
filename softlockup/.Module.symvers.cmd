@@ -1,1 +1,0 @@
-savedcmd_/home/sherlock/tests/softlockup/Module.symvers :=  scripts/mod/modpost -M        -o /home/sherlock/tests/softlockup/Module.symvers -T /home/sherlock/tests/softlockup/modules.order -i Module.symvers -e 

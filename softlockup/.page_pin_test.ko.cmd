@@ -1,1 +1,0 @@
-savedcmd_/home/sherlock/tests/softlockup/page_pin_test.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o /home/sherlock/tests/softlockup/page_pin_test.ko /home/sherlock/tests/softlockup/page_pin_test.o /home/sherlock/tests/softlockup/page_pin_test.mod.o

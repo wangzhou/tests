@@ -1,20 +1,25 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/cleanup.h>
 
 MODULE_LICENSE("Dual BSD/GPL");
 
 static int __init busyloop_init(void)
 {
 	spinlock_t lock;
-	int tmp;
+	spinlock_t s_lock;
+	int tmp, tmp1, tmp2;
 
 	spin_lock_init(&lock);
 
-	spin_lock_irq(&lock);
+	guard(spinlock_irq)(&lock);
 	while (1) {
-		tmp++;
+		scoped_guard(spinlock_irq, &s_lock) {
+			tmp++;
+			tmp1++;
+		}
+		tmp2++;
 	}
-	spin_unlock_irq(&lock);
 
         return 0;
 }
