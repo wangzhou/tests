@@ -1,0 +1,2 @@
+*.ext4 filter=lfs diff=lfs merge=lfs -text
+*.cpio.gz filter=lfs diff=lfs merge=lfs -text
