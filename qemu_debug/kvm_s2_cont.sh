@@ -8,7 +8,7 @@
  	-append "console=ttyAMA0 root=/dev/ram init=/init default_hugepagesz=64K" \
 	-nographic \
 	-kernel /home/wz/linux/arch/arm64/boot/Image \
-	-initrd /home/wz/tests/qemu_debug/rootfs.cpio.gz \
+	-initrd /home/wz/tests/qemu_debug/rootfs_sshd_new.cpio.gz \
 	-device virtio-9p-pci,fsdev=p9fs,mount_tag=p9,bus=pcie.0 \
 	-fsdev local,id=p9fs,path=./kvm_s2_test,security_model=mapped \
 	-device virtio-net-pci,netdev=mynet1,id=net0 \
