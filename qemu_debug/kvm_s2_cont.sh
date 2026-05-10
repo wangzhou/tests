@@ -1,7 +1,7 @@
 #!/bin/sh
 
 /home/wz/qemu/build/qemu-system-aarch64 \
-	-m 4G \
+	-m 10G \
 	-smp 4 \
 	-cpu max \
 	-machine virt,gic-version=3,acpi=on,virtualization=true \
