@@ -47,7 +47,7 @@ SMMU HTTU ──(前置依赖)──→ SMMU HDBSS
 2. QEMU L1 中模拟 SMMUv3 **HDBSS**（脏页上报 ring buffer），**依赖步骤 1**
 3. Guest 内核中增加 SMMUv3 HTTU + HDBSS 驱动，通过 IOMMUFD 暴露 dirty tracking
 4. QEMU L2 中基于 VFIO/IOMMUFD 实现设备热迁移的脏页跟踪
-5. 配套：L1 QEMU 中模拟 NVMe SR-IOV（VF 直通用）
+5. 配套：L1 QEMU 中模拟 NVMe PF 并直通到 L2，作为脏页产生的 DMA 设备
 
 ---
 
@@ -77,15 +77,15 @@ SMMU HTTU ──(前置依赖)──→ SMMU HDBSS
 
 | 层 | 组件 | 关键内容 |
 |---|------|---------|
-| L2 QEMU | VFIO 用户态 | passthrough NVMe VF; query IOMMUFD dirty bitmap; hot migration |
+| L2 QEMU | VFIO 用户态 | passthrough NVMe PF; query IOMMUFD dirty bitmap; hot migration |
 | Outer VM | Linux Kernel | SMMUv3 driver (HTTU + HDBSS); IOMMUFD; VFIO; KVM (nested) |
-| L1 QEMU | 硬件模拟 | SMMUv3 HTTU + HDBSS simulation; NVMe SR-IOV simulation |
+| L1 QEMU | 硬件模拟 | SMMUv3 HTTU + HDBSS simulation; NVMe PF simulation |
 | Host | 网络 | bridge br0 + tap0/tap1, 192.168.100.0/24 |
 
 ### 数据流: 一次 DMA 如何触发脏页跟踪
 
 ```
-NVMe VF DMA write
+NVMe PF DMA write
         |
         v
 SMMU HTTU (DBM mark dirty in PTE)
@@ -140,18 +140,48 @@ VFIO migration (send dirty pages to dst)
 
 ---
 
-### Phase 1: NVMe SR-IOV 模拟 + VF 直通（预估 2-3 周）
+### Phase 1: NVMe PF 模拟 + 直通（预估 1-2 天）
 
-**目标**：在 L1 QEMU 中模拟带 VF 的 NVMe，打通 "L2 QEMU → VFIO → NVMe VF → Inner VM" 链路。
+**目标**：在 L1 QEMU 中模拟一个普通的 NVMe PF（不需 SR-IOV），通过 vfio-pci 直通到 L2，作为 DMA 脏页产生的设备。
 
-| 步骤 | 内容 | 关键文件/补丁 |
-|------|------|--------------|
-| 1.1 | L1 QEMU 启动命令中添加 NVMe SR-IOV：`-device nvme,id=nvme0,serial=deadbeef,sriov_max_vfs=8,sriov_vq_flexible=2,num_queues=64` | 启动脚本 |
-| 1.2 | Outer VM 内验证 NVMe PF + 8 VF 可见（`lspci \| grep -i nvme`） | Guest NVMe 驱动 |
-| 1.3 | 拉取 [NVMe live migration v2](https://patchew.org/QEMU/20260304091229.80725-1-alexander@mihalicyn.com/)（4 patches, 2026.3），应用到 QEMU | `hw/nvme/*` |
-| 1.4 | 在 patch 基础上解除 SR-IOV 迁移限制（当前明确禁用） | `hw/nvme/ctrls/sriov.c` |
-| 1.5 | Outer VM 内 bind NVMe VF → vfio-pci；L2 QEMU `-device vfio-pci,host=0000:00:01.1` 直通 | L2 启动命令 |
-| 1.6 | Inner VM 验证 NVMe VF 可用（`lsblk` + `fio` 读写） | Inner VM |
+**设计决策**：Phase 5 中 L2 迁移时，NVMe **设备状态不通过 VFIO migration 迁移**（原因见下文），目标端做 FLR reset + Inner VM 驱动 re-init。这不会阻塞 SMMU HDBSS 的核心目标（脏页跟踪 + RAM 迁移）。设备状态迁移的正确路径是 NVMe 2.1 标准（见下文），但目前 Linux/QEMU 生态尚未就绪。
+
+| 步骤 | 内容 | 验证方式 |
+|------|------|---------|
+| 1.1 | L1 QEMU 启动命令添加 NVMe PF：`-device nvme,serial=deadbeef`（无需 SR-IOV 参数） | Outer VM 内 `lspci` 可见 NVMe 设备 |
+| 1.2 | Outer VM 内 bind NVMe PF → vfio-pci | `ls /dev/vfio/` |
+| 1.3 | L2 QEMU `-device vfio-pci,host=...` 直通 | Inner VM 可见 NVMe 设备 |
+| 1.4 | Inner VM 验证 NVMe 可用（`lsblk` + `fio` 读写） | 产生 DMA 流量 |
+
+#### 设备状态迁移：NVMe 2.1 Live Migration 标准
+
+NVMe 2.1（2024.8 批准，TP4159）定义了标准化的控制器热迁移协议：
+
+```
+源端                                    目标端
+─────                                   ─────
+Migration Send (Suspend)                (等待)
+  控制器暂停，队列冻结
+Migration Receive (Get Controller State)
+→ [设备状态数据] →                      Migration Send (Set Controller State)
+                                        Migration Send (Resume)
+                                          控制器恢复，I/O 继续
+```
+
+**新增 Admin 命令**：`Migration Send`（Suspend/SetState/Resume）、`Migration Receive`（GetState）、`Controller Data Queue`（迁移专用数据队列）。
+
+**当前生态现状**：
+
+| 组件 | 状态 |
+|------|------|
+| NVMe 2.1 标准 | ✅ 已批准（2024.8） |
+| `libnvme` | ✅ 已有命令封装 |
+| Linux nvme 驱动 | ❌ 未实现 Migration Send/Receive |
+| Linux VFIO nvme variant driver | ❌ Intel 2022 RFC (`nvme-vfio`) 被拒绝，再无后续 |
+| QEMU NVMe 模型 | ❌ 未实现 NVMe 2.1 新命令 |
+| QEMU Mikhalitsyn NVMe 迁移补丁 | v3 审核中，但走 QEMU 内部 save/load，不暴露 VFIO migration region，不适用于嵌套 L2 迁移场景 |
+
+**结论**：NVMe 2.1 是设备状态迁移的正确方向，但整个软件栈（内核 + QEMU）至少还需 1-2 年成熟。本项目不等待这一依赖，Phase 5 中设备状态采用 reset-on-destination 策略。
 
 ---
 
