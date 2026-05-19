@@ -236,17 +236,30 @@ Migration Receive (Get Controller State)
 
 ---
 
-### Phase 5: QEMU L2 — VFIO 脏页跟踪 + 热迁移（预估 3-4 周）
+### Phase 5: QEMU L2 — IOMMUFD 脏页跟踪 + 热迁移（预估 3-4 周）
 
-**目标**：在 L2 QEMU 中通过 IOMMUFD 利用 SMMU HDBSS 进行 VFIO 设备热迁移。
+**目标**：在 L2 QEMU 中通过 IOMMUFD 利用 SMMU HDBSS 获取 DMA 脏页 bitmap，驱动 L2 热迁移的 RAM 拷贝。NVMe 设备状态采用 reset-on-destination 策略（Phase 1 决策）。
+
+#### 关键分离：迁移的两个独立关注点
+
+```
+L2 热迁移
+  ├── 内存脏页跟踪 ──── IOMMUFD → SMMU HDBSS ring buffer ─── 本项目核心目标
+  └── 设备状态迁移 ──── VFIO migration region ─── 暂不支持（NVMe 2.1 未就绪）
+                         ↓
+                    目标端 FLR reset + Inner VM 驱动 re-init
+```
 
 | 步骤 | 内容 | 关键文件 |
 |------|------|---------|
 | 5.1 | 研究 QEMU 10.x/11.x IOMMU dirty tracking 框架（`hw/vfio/migration.c` + `backends/iommufd.c` + `hw/vfio/iommufd.c`） | `hw/vfio/*` |
 | 5.2 | L2 QEMU 通过 IOMMUFD 创建带 `IOMMU_HWPT_ALLOC_DIRTY_TRACKING` 的 HWPT | `backends/iommufd.c` |
-| 5.3 | 集成 dirty bitmap sync：QEMU migration 框架调用 `IOMMU_HWPT_GET_DIRTY_BITMAP` ioctl（背靠 SMMU HDBSS ring buffer） | `hw/vfio/container.c` |
+| 5.3 | **核心**：集成 dirty bitmap sync — QEMU migration 框架调用 `IOMMU_HWPT_GET_DIRTY_BITMAP` ioctl（底层走 SMMU HDBSS ring buffer） | `hw/vfio/container.c` |
 | 5.4 | 补全 SMMUv3 vIOMMU 下的迁移支持（QEMU 11.0 `accel=on` 已合入，迁移未完整） | `hw/arm/smmuv3.c` |
-| 5.5 | 端到端测试：src L2 QEMU（Inner VM + NVMe VF）→ 热迁移 → dst L2 QEMU，验证 VM 状态 + NVMe VF 状态正确恢复、脏页跟踪生效 | 完整流程 |
+| 5.5 | NVMe 设备状态处理：目标端 FLR reset → vfio-pci 重新初始化 → Inner VM NVMe 驱动 re-init | `hw/vfio/pci.c` |
+| 5.6 | 端到端测试：src L2 QEMU（Inner VM + NVMe PF）→ 热迁移 → dst L2 QEMU，验证 RAM 迁移正确，Inner VM 内 NVMe 重新可用 | 完整流程 |
+
+**已知限制**：设备状态不迁移，在飞 I/O 丢失。Inner VM 文件系统依赖 journal replay 保证一致性。未来 NVMe 2.1 生态成熟后可补上设备状态迁移（见 Phase 1 讨论）。
 
 ---
 
@@ -267,8 +280,7 @@ Migration Receive (Get Controller State)
 ```
 Phase 0 (基础升级)
   │
-  ├──→ Phase 1 (NVMe SR-IOV)
-  │       └──→ VF 直通链路就绪 (可与 Phase 2+3 并行)
+  ├──→ Phase 1 (NVMe PF 直通) ─── 1-2 天，快速打通
   │
   └──→ Phase 2 (QEMU L1: SMMU HTTU 模拟)
             │
@@ -282,7 +294,9 @@ Phase 0 (基础升级)
             │
             │  [严格依赖]
             ▼
-          Phase 5 (QEMU L2: VFIO dirty track + 热迁移)
+          Phase 5 (QEMU L2: IOMMUFD dirty track + 热迁移)
+            │  ├── 5a: 脏页跟踪 + RAM 迁移（核心目标）
+            │  └── 5b: 设备状态 reset-on-dest（已知限制）
             │
             └──→ 端到端嵌套迁移验证
 
@@ -290,17 +304,16 @@ Phase 0 (基础升级)
 ```
 
 - **Phase 0 是所有工作的前置**
-- **Phase 1 与 Phase 2-3 可并行**（NVMe 模块 vs SMMU 模块，互不依赖）
+- **Phase 1 工作量小，可与 Phase 2 并行或先后启动**
 - **Phase 2 → 3 → 4 → 5 是严格串行链**，项目核心路径
 - **Phase 6 与核心路径解耦**，可与 Phase 3 之后任意阶段并行
 
 ---
 
-## 七、关键补丁清单
+## 七、关键补丁与标准
 
 | 补丁 | 作者 | 版本 | 状态 | 用途 | Phase |
 |------|------|------|------|------|-------|
-| [QEMU NVMe live migration](https://patchew.org/QEMU/20260304091229.80725-1-alexander@mihalicyn.com/) | Mikhalitsyn | v2 (2026.3) | 审核中 | L1 NVMe 迁移（需解 SR-IOV 限制） | 1 |
 | [SMMUv3 HTTU mainline](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&q=HTTU) | Jiang/Kolothum | v6.11 | **已合入** | Guest 内核 HTTU 基础 | 4 |
 | [SMMUv3 SVA HTTU](https://patchew.org/linux/20260503135413.1108138-1-nicolinc@nvidia.com/) | Nicolin Chen | v1 (2026.5) | 审核中 | SVA 场景 HA/HD | 4 |
 | [QEMU SMMUv3 user-creatable](https://patchew.org/QEMU/20250703084643.85740-1-shameerali.kolothum.thodi@huawei.com/) | Kolothum | v6 (2025.7) | 审核中 | SMMUv3 device model | 2 |
@@ -308,6 +321,14 @@ Phase 0 (基础升级)
 | [SMMUv3 accel dirty tracking](https://qemu.googlesource.com/qemu/+/659275f8) | Kolothum | 已合入 | **已合入 QEMU** | 嵌套父 HWPT 脏位 flag | 5 |
 | [FEAT_HDBSS v3](https://lore.kernel.org/lkml/20260225040421.2683931-1-zhengtian10@huawei.com/) | Tian Zheng | v3 (2026.2) | 审核中 | CPU HDBSS（可选） | 6 |
 | [pKVM SMMUv3 v4](https://lore.kernel.org/20250819215156.2494305-21-smostafa@google.com/) | Mostafa Saleh | v4 (2025.8) | 审核中 | 嵌套 SMMUv3 参考 | 参考 |
+
+**不再需要的补丁**：
+
+| 补丁 | 原因 |
+|------|------|
+| [QEMU NVMe live migration](https://patchew.org/QEMU/20260304091229.80725-1-alexander@mihalicyn.com/) (Mikhalitsyn) | 走 QEMU 内部 save/load，不暴露 VFIO migration region，不适用于嵌套 L2 VFIO 迁移场景 |
+
+**未来参考**：NVMe 2.1（TP4159, 2024.8 批准）定义了标准化的控制器热迁移协议（Migration Send/Receive），是设备状态迁移的正确方向。待 Linux nvme 驱动 + QEMU NVMe 模型实现 NVMe 2.1 新命令后，可替代当前的 reset-on-destination 策略。
 
 ---
 
@@ -317,7 +338,7 @@ Phase 0 (基础升级)
 |------|------|---------|
 | QEMU SMMUv3 HTTU 模拟工作量大（PTE 遍历逻辑复杂） | Phase 2 延期 | 先做最小版本：声明 HTTU + 基础 DBM 置位，后续迭代 |
 | SMMU HDBSS 硬件 spec 不公开或文档不全 | Phase 3 阻塞 | 从内核 FEAT_HDBSS patch 逆推行为；参考 Intel VT-d PML 的模拟实现 |
-| NVMe SR-IOV 迁移 patch 不成熟 | Phase 1 延期 | 先做 VF 直通（1.1-1.2, 1.5-1.6），迁移部分等 upstream |
 | QEMU 8.2 → master 升级兼容性 | Phase 0 阻塞 | 保留 8.2 备份 |
 | 内核 backport 冲突（6.6 → 6.11 HTTU） | Phase 4 延期 | 评估直接升级到 6.12+ |
 | HDBSS ring buffer 模拟 + guest 中断联动调试极难 | Phase 3+4 | 充分打 trace events；先单步验证 ring buffer 读写 |
+| NVMe 设备状态无法通过 VFIO 迁移（Phase 5 已知限制） | 在飞 I/O 丢失 | Inner VM 文件系统 journal replay 保证一致性；长期等 NVMe 2.1 生态成熟 |

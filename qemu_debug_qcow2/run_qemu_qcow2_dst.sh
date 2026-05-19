@@ -21,9 +21,11 @@ qemu-system-aarch64 \
   -accel tcg \
   -m 4G \
   -smp 4 \
-  -append "root=/dev/vda2 rw console=ttyAMA0" \
+  -append "root=/dev/vda2 rw console=ttyAMA0 default_hugepagesz=64K selinux" \
   -kernel /home/wz/linux/arch/arm64/boot/Image \
   -drive file=./openEuler-24.03-LTS-SP2-aarch64_dst.qcow2,format=qcow2,if=virtio \
   -nographic \
   -netdev tap,id=net0,ifname=tap1,script=no,downscript=no \
   -device virtio-net-pci,netdev=net0,mac=52:54:00:12:34:02 \
+  -device virtio-9p-pci,fsdev=p9fs,mount_tag=hostshare,bus=pcie.0 \
+  -fsdev local,id=p9fs,path=./share,security_model=mapped \

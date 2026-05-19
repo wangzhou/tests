@@ -44,9 +44,9 @@ sudo ./setup_bridge.sh
 
 # 3. 虚机内配 IP
 # src 虚机:
-ip addr add 192.168.100.10/24 dev eth0 && ip link set eth0 up
+ip addr add 192.168.100.10/24 dev enp0s1 && ip link set enp0s1 up
 # dst 虚机:
-ip addr add 192.168.100.20/24 dev eth0 && ip link set eth0 up
+ip addr add 192.168.100.20/24 dev enp0s1 && ip link set enp0s1 up
 ```
 
 ## 当前能力

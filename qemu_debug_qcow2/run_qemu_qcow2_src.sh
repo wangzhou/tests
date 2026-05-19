@@ -19,11 +19,13 @@ qemu-system-aarch64 \
   -machine virt,gic-version=3,acpi=on,virtualization=true \
   -cpu max \
   -accel tcg \
-  -m 4G \
-  -smp 4 \
-  -append "root=/dev/vda2 rw console=ttyAMA0" \
   -kernel /home/wz/linux/arch/arm64/boot/Image \
+  -append "root=/dev/vda2 rw console=ttyAMA0 default_hugepagesz=64K selinux" \
+  -m 6G \
+  -smp 4 \
   -drive file=./openEuler-24.03-LTS-SP2-aarch64_src.qcow2,format=qcow2,if=virtio \
   -nographic \
   -netdev tap,id=net0,ifname=tap0,script=no,downscript=no \
   -device virtio-net-pci,netdev=net0,mac=52:54:00:12:34:01 \
+  -device virtio-9p-pci,fsdev=p9fs,mount_tag=hostshare,bus=pcie.0 \
+  -fsdev local,id=p9fs,path=./share,security_model=mapped \
