@@ -11,5 +11,5 @@
 	-nographic \
 	-kernel ./Image \
 	-initrd ./rootfs_mini.cpio.gz \
-	-mem-patch /dev/hugepages \
+	-mem-path /dev/hugepages \
 	-incoming tcp:192.168.100.20:6666
