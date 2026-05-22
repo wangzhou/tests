@@ -15,7 +15,7 @@
 #
 # 前置条件: sudo ./setup_bridge.sh
 
-qemu-system-aarch64 \
+~/qemu/build/qemu-system-aarch64 \
   -machine virt,gic-version=3,acpi=on,virtualization=true \
   -cpu max \
   -accel tcg \
